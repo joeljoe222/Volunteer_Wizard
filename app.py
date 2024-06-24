@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
@@ -21,13 +21,22 @@ def index():
 def about():
     return render_template("about.html")
 
-@app.route("/register")
+@app.route("/register", methods=['GET','POST'])
 def register():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        role = request.form['role']
+        
+        #save to db here later
+       
+        return redirect(url_for('profile'))
+
     return render_template("register.html")
 
 @app.route("/profile", methods=['GET','POST'])
 def profile():
-    # caltures data entered from profile.html
+    # captures data entered from profile.html
     if request.method == 'POST':
 
         full_name = request.form['full_name']
