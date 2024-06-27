@@ -52,6 +52,12 @@ def profile():
         return "Profile successfully updated!"
     return render_template("profile.html", states=states, skills=skills)
 
+@app.route("/eventManager")
+def eventManager():
+    return render_template("eventManager.html");
 
+@app.route("/notificationSystem")
+def notificationManager():
+    return render_template("notificationSystem.html");
 
 if __name__ == '__main__': app.run(host='0.0.0.0', debug=True) # starts server
