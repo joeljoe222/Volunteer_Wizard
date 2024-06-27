@@ -3,11 +3,11 @@
     "configurations": [
         {
             "name": "Python: Flask",
-            "type": "python",
+            "type": "debugpy",  // Correct the type field to "python"
             "request": "launch",
-            "program": "${workspaceFolder}/app.py",  // Path to your Flask app file
+            "program": "${workspaceFolder}/app.py",
             "env": {
-                "FLASK_APP": "app.py",  // Name of your main Flask app file
+                "FLASK_APP": "${workspaceFolder}/app.py",
                 "FLASK_ENV": "development"
             },
             "args": [
