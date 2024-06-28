@@ -90,11 +90,11 @@ def event():
 
 @app.route("/volunteer")
 def volunteer():
-    return render_template("volunteer.html")
+    return render_template("volunteerMatching.html")
 
 @app.route("/admin")
 def admin():
-    return render_template("admin.html")
+    return render_template("adminMatching.html")
 
 @app.route("/history")
 def history():
