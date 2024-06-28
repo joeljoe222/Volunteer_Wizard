@@ -1,20 +1,21 @@
 {% extends 'base.html' %} {% block content %}
 
-<div class="container p-3 bg-primary bg-opacity-25 border border-info rounded">
-    <h1>Log in page</h1>
-    <form>
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email">
-        </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password">
-        </div>
-        <button type="submit" class="btn btn-primary">Log in</button>
-    </form>
-
-
+<div class="container">
+    <div class="col-md-4 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
+        <h2>Log in page</h2>
+        <form>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email">
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password">
+            </div>
+            <button type="submit" class="w-100 btn btn-primary">Log in</button>
+            <a class="nav-link" href="{{url_for('register')}}">Register Account</a>
+        </form>
+    </div>
 </div>
 
 {% endblock %}

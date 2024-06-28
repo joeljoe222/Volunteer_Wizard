@@ -1,0 +1,32 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container">
+    <main>
+		<div class="col-md-9 col-sm-10 mx-auto">
+			<div class="row-md-5 p-3 bg-primary bg-opacity-25 border border-bottom-0 border-info rounded-top">
+				<div>
+					<a class="nav-link" href="{{url_for('eventManager')}}">Manage Event</a>
+					<a class="nav-link" href="{{url_for('notification')}}">Make a Notification</a>
+					<h2 class="col">Event Name</h2>
+					<div class="col py-1 px-2 bg-light rounded">
+						<h4>Date : Urgency Level</h4>
+						<h4>1234 Main St : Address</h4>
+						<p>Description of the Event will go here</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="row-md-5 p-3 bg-primary bg-opacity-25 border border-info border-top-0 rounded-bottom">
+				<div>
+					<h4>Required Skills</h4>
+					<div class="col py-1 px-2 bg-light rounded">
+						<h4>Event Name : Assignment</h4>
+						<p>Assignments given by event managers to volunteers. These Tabs will have the date and time assignment is due at the top right corner. These are assignments already previously viewed by volunteer</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+</div>
+
+{% endblock %}

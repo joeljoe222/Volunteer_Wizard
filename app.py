@@ -52,24 +52,52 @@ def profile():
         return "Profile successfully updated!"
     return render_template("profile.html", states=states, skills=skills)
 
-@app.route("/eventManager")
-def eventManager():
-    return render_template("eventManager.html");
-
 @app.route("/notificationSystem")
 def notificationManager():
     return render_template("notificationSystem.html");
 
-@app.route("/Volunteer matching form")
-def volunteerMatching():
-    return render_template("volunteerMatching.html")
 
-@app.route("/Admin volunteer matching form")
-def adminMatching():
-    return render_template("adminMatching.html")
+@app.route("/notification", methods=['GET','POST'])
+def notification():
+    if request.method == 'POST':
 
-@app.route("/Volunteer history")
-def volunteerHistory():
+        notifName = request.form['notifName']
+        notifDesc = request.form['notifDesc']
+
+        return "Notification Created"
+    return render_template("notification.html");
+
+@app.route("/eventManager", methods=['GET','POST'])
+def eventManager():
+    if request.method == 'POST':
+
+        eventName = request.form['eventName']
+        eventDesc = request.form['eventDesc']
+        eventDate = request.form['eventDate']
+        urgency = request.form['urgency']
+        eventAddress = request.form['eventAddress']
+        country = request.form['country']
+        state = request.form['state']
+        zipcode = request.form['zipcode']
+        requiredSkills = request.form['requiredSkills']
+
+        return "Event created/updated"
+    return render_template("eventManager.html");
+
+@app.route("/event")
+def event():
+    return render_template("event.html")
+
+@app.route("/volunteer")
+def volunteer():
+    return render_template("volunteer.html")
+
+@app.route("/admin")
+def admin():
+    return render_template("admin.html")
+
+@app.route("/history")
+def history():
     return render_template("history.html")
 
 if __name__ == '__main__': app.run(host='0.0.0.0', debug=True) # starts server
