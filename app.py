@@ -56,9 +56,17 @@ def profile():
 def eventManager():
     return render_template("eventManager.html");
 
+@app.route("/event")
+def event():
+    return render_template("event.html")
+
 @app.route("/notificationSystem")
 def notificationManager():
     return render_template("notificationSystem.html");
+
+@app.route("/notification")
+def notification():
+    return render_template("notification.html");
 
 @app.route("/volunteer")
 def volunteer():
