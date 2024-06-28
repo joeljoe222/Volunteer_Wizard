@@ -4,11 +4,11 @@
     <main>
         <div class="col-md-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
             <h2>Manage Event</h2>
-            <form class="needs-validation" novalidate>
+            <form method="POST">
                 <div class="row g-2">
                     <div class="row-sm-6">
                         <label for="eventName" class="form-label">Event Name</label>                            
-                        <input type="text" class="form-control" id="eventName" required maxlength="100">
+                        <input type="text" class="form-control" id="eventName" name="eventName" maxlength="100">
                         <div class="invalid-feedback">
                             Valid Name is required.
                         </div>
@@ -16,21 +16,21 @@
                     </div>
                     <div class="row-sm-6">
                         <label for="eventDesc" class="form-label">Event Description</label>
-                        <textarea class="form-control" id="eventDesc" placeholder="Give information useful for volunteers to know" required></textarea>
+                        <textarea class="form-control" id="eventDesc" name="eventDesc" placeholder="Give information useful for volunteers to know" required></textarea>
                         <div class="invalid-feedback">
                             Valid Description is required.
                         </div>
                     </div>
                     <div class="col-md-6">
                         <label for="eventDate" class="form-label">Event Date</label>
-                        <input type="date" class="form-control" id="eventDate">
+                        <input type="date" class="form-control" id="eventDate" name="eventDate">
                         <div class="invalid-feedback">
                             Please select a date.
                         </div>
                     </div>
                     <div class="col-md-6">
                         <label for="urgency" class="form-label">Level of Urgency</label>
-                        <select class="form-select" id="urgency" required>
+                        <select class="form-select" id="urgency" name="urgency" required>
                             <option selected disabled>Select Urgency</option>
                             <option value="1">One</option>
                             <option value="2">Two</option>
@@ -40,15 +40,15 @@
                         </select>
                     </div>
                     <div class="col-12">
-                        <label for="address" class="form-label">Address</label>
-                        <input type="text" class="form-control" id="address" placeholder="1234 Main St" required>
+                        <label for="eventAddress" class="form-label">Address</label>
+                        <input type="text" class="form-control" id="eventAddress" name="eventAddress" placeholder="1234 Main St" required>
                         <div class="invalid-feedback">
                             Please enter your shipping address.
                         </div>
                     </div>
                     <div class="col-md-5">
                         <label for="country" class="form-label">Country</label>
-                        <select class="form-select" id="country" required>
+                        <select class="form-select" id="country" name="country" required>
                             <option value="">Choose...</option>
                             <option>United States</option>
                         </select>
@@ -58,7 +58,7 @@
                     </div>
                     <div class="col-md-4">
                         <label for="state" class="form-label">State</label>
-                        <select class="form-select" id="state" required>
+                        <select class="form-select" id="state" name="state" required>
                             <option value="">Choose...</option>
                             <option>California</option>
                         </select>
@@ -67,15 +67,15 @@
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <label for="zip" class="form-label">Zip</label>
-                        <input type="text" class="form-control" id="zip" placeholder="" required>
+                        <label for="zipcode" class="form-label">Zip</label>
+                        <input type="text" class="form-control" id="zipcode" name="zipcode" required>
                         <div class="invalid-feedback">
                             Zip code required.
                         </div>
                     </div>
                     <div class="col-12 pb-3">
                         <label for="requiredSkills" class="form-label">Required Skills</label>
-                        <select class="form-select" id="requiredSkills" multiple required>
+                        <select class="form-select" id="requiredSkills" name="requiredSkills" multiple required>
                             <option value="skill1">Skill 1</option>
                             <option value="skill2">Skill 2</option>
                             <option value="skill3">Skill 3</option>

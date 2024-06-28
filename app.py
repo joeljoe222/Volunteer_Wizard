@@ -52,21 +52,40 @@ def profile():
         return "Profile successfully updated!"
     return render_template("profile.html", states=states, skills=skills)
 
-@app.route("/eventManager")
+@app.route("/notificationSystem")
+def notificationManager():
+    return render_template("notificationSystem.html");
+
+@app.route("/notification", methods=['GET','POST'])
+def notification():
+    if request.method == 'POST':
+
+        notifName = request.form['notifName']
+        notifDesc = request.form['notifDesc']
+
+        return "Notification Created"
+    return render_template("notification.html");
+
+@app.route("/eventManager", methods=['GET','POST'])
 def eventManager():
+    if request.method == 'POST':
+
+        eventName = request.form['eventName']
+        eventDesc = request.form['eventDesc']
+        eventDate = request.form['eventDate']
+        urgency = request.form['urgency']
+        eventAddress = request.form['eventAddress']
+        country = request.form['country']
+        state = request.form['state']
+        zipcode = request.form['zipcode']
+        requiredSkills = request.form['requiredSkills']
+
+        return "Event created/updated"
     return render_template("eventManager.html");
 
 @app.route("/event")
 def event():
     return render_template("event.html")
-
-@app.route("/notificationSystem")
-def notificationManager():
-    return render_template("notificationSystem.html");
-
-@app.route("/notification")
-def notification():
-    return render_template("notification.html");
 
 @app.route("/volunteer")
 def volunteer():
