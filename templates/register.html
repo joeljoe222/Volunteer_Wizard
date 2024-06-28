@@ -1,25 +1,27 @@
 {% extends 'base.html' %} {% block content %}
 
-<div class="container p-3 bg-primary bg-opacity-25 border border-info rounded">
-    <h2>First Time User Registration</h2>
-    <form action="/register" method="POST">
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" required>
-        </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-        <div class="mb-3">
-            <label for="role" class="form-label">Role</label>
-            <select class="form-select" id="role" name="role" aria-label="Default select example">
-                <option selected></option>
-                <option value="1">Volunteer</option>
-                <option value="2">Administrator</option>
-              </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+<div class="container">
+    <div class="col-md-4 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
+        <h2>First Time User Registration</h2>
+        <form action="/register" method="POST">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="mb-3">
+                <label for="role" class="form-label">Role</label>
+                <select class="form-select" id="role" name="role" aria-label="Default select example">
+                    <option selected></option>
+                    <option value="1">Volunteer</option>
+                    <option value="2">Administrator</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
 </div>
 {% endblock %}
