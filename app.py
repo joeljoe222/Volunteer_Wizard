@@ -56,6 +56,7 @@ def profile():
 def notificationManager():
     return render_template("notificationSystem.html");
 
+
 @app.route("/notification", methods=['GET','POST'])
 def notification():
     if request.method == 'POST':
