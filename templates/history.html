@@ -3,31 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>History Form</title>
-    <link rel="stylesheet" href="./styles.css" />
-</head>
+    <title>Volunteer History</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <style>
+   
+   
+    </style>
+  </head>
 <body>
-    <div id="main">
-    <h1>Volunteer History Form</h1>
+    <div class="container">
+        <br>
+          <h1 class="text-center">Volunteer History Form</h1>
+        <br>
+    </div>
+    
+    <div class="container">
+        <br>
+          <h3 class="text-center">Volunteer Information</h3>
+        <br>
     </div>
 
+    <div class="text-center border" style="width: 50%; margin-left: 25%;">
+      <b>Name:</b>
+      <p>John Doe</p>
+      <b>Skills:</b>
+      <p>Communication, Time management, Leadership</p>
+    </div>  
+      
 
-    <div class="info-box">
-        <div class="info-item">
-            <b>Name:</b>
-            <span>John Doe</span>
-        </div>
-        <div class="info-item">
-            <b>Skills:</b>
-            <span id="skill-info">Communication, Time management, Leadership</span>
-        </div>
-    </div>
-    <div id="second-title">
-        <h3>Volunteer History</h3>
-    </div>
-    <div class="hist-box">
-        <table id="volunteer-history">
-            <tr>
+      <div class="container">
+        <br>
+          <h3 class="text-center">Volunteer History</h3>
+        <br>
+      </div>
+    
+      <div class="row justify-content-center">
+        <div class="col-auto">
+            <table class="table table-responsive">
+            <thead>
+              <tr class="text-center">
                 <th>Event Name</th>
                 <th>Event Description</th>
                 <th>Location</th>
@@ -35,28 +49,34 @@
                 <th>Urgency</th>
                 <th>Event Date</th>
                 <th>Participation Status</th>
-            </tr>
-            <tr>
-                <td>Early Voting</td>
-                <td>Helping voters at the polls</td>
-                <td>Houston, TX (77490)</td>
-                <td>Communication, Time management, Leadership</td>
-                <td>Medium</td>
-                <td>10/24/2024</td>
-                <td>Complete</td>
-            </tr>
-            <tr>
-                <td>Food Drive</td>
-                <td>Food drive for people in need</td>
-                <td>Houston, TX (73031)</td>
-                <td>Communication, Time management, Leadership</td>
-                <td>High</td>
-                <td>12/13/2024</td>
-                <td>In Progress</td>
-            </tr>
-        </table>
-    </div>
-
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="text-center">
+                  <td>Early Voting</td>
+                  <td>Helping voters at the polls</td>
+                  <td>Houston, TX (77490)</td>
+                  <td>Communication, Time management, Leadership</td>
+                  <td>2</td>
+                  <td>10/24/2024</td>
+                  <td>Complete</td>
+              </tr>
+              <tr class="text-center">
+                  <td>Food Drive</td>
+                  <td>Food drive for people in need</td>
+                  <td>Houston, TX (73031)</td>
+                  <td>Communication, Time management, Leadership</td>
+                  <td>1</td>
+                  <td>12/13/2024</td>
+                  <td>In Progress</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 </body>
 </html>

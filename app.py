@@ -62,14 +62,14 @@ def notificationManager():
 
 @app.route("/Volunteer matching form")
 def volunteerMatching():
-    return render_template("volunteer.html")
+    return render_template("volunteerMatching.html")
 
 @app.route("/Admin volunteer matching form")
 def adminMatching():
-    return render_template("admin.html")
+    return render_template("adminMatching.html")
 
 @app.route("/Volunteer history")
-def adminMatching():
+def volunteerHistory():
     return render_template("history.html")
 
 if __name__ == '__main__': app.run(host='0.0.0.0', debug=True) # starts server
