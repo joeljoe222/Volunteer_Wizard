@@ -46,6 +46,7 @@ def profile():
         state = request.form['state']
         zip_code = request.form['zip_code']
         skills_selected = request.form.getlist('skills')
+        preferences = request.form['preferences']
         availability_dates = request.form.getlist('availability[]')
 
         # save to database add later
