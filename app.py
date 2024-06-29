@@ -41,11 +41,12 @@ def profile():
 
         full_name = request.form['full_name']
         address1 = request.form['address1']
+        address2 = request.form['address2']
         city = request.form['city']
         state = request.form['state']
         zip_code = request.form['zip_code']
         skills_selected = request.form.getlist('skills')
-        availability = request.form['availability']
+        availability_dates = request.form.getlist('availability[]')
 
         # save to database add later
 

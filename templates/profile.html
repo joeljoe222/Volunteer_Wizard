@@ -31,16 +31,16 @@
                     <input type="text" class="form-control" id="zip_code" name="zip_code" pattern="[0-9]{5}(-[0-9]{4})?" required>
                 </div>
                 <div class="mb-3">
-                    <label for="address1" class="form-label">Address 2</label>
-                    <input type="text" class="form-control" id="address1" name="address1" required maxlength="100">
+                    <label for="address2" class="form-label">Address 2</label>
+                    <input type="text" class="form-control" id="address2" name="address2" maxlength="100">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="city" class="form-label">City</label>
-                    <input type="text" class="form-control" id="city" name="city" required maxlength="100">
+                    <input type="text" class="form-control" id="city" name="city" maxlength="100">
                 </div>
                 <div class="col-md-2 mb-3">
                     <label for="state" class="form-label">State</label>
-                    <select class="form-select" id="state" name="state" required>
+                    <select class="form-select" id="state" name="state">
                         <option value="">Select State</option>
                         {% for state in states %}
                         <option value="{{ state['code'] }}">{{ state['name'] }}</option>
@@ -49,7 +49,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="zip_code" class="form-label">Zip Code</label>
-                    <input type="text" class="form-control" id="zip_code" name="zip_code" pattern="[0-9]{5}(-[0-9]{4})?" required>
+                    <input type="text" class="form-control" id="zip_code" name="zip_code" pattern="[0-9]{5}(-[0-9]{4})?">
                 </div>
                 <div class="mb-3">
                     <label for="skills" class="form-label">Skills</label>
@@ -62,8 +62,12 @@
                 </div>
                 <div class="mb-3">
                     <label for="availability" class="form-label">Availability</label>
-                    <input type="date" class="form-control" id="availability" name="availability" required>
+                    <div id="availabilityInputs">
+                        <input type="date" class="form-control" name="availability[]" required>
+                    </div>
+                    <button type="button" class="btn btn-secondary mt-2" onclick="addAvailability()">Add Availability</button>
                 </div>
+
                 <button type="submit" class="btn btn-primary">Save Profile</button>
             </div>
         </form>
@@ -78,8 +82,8 @@
     $(document).ready(function() {
         $('#skills').select2({
             theme: "bootstrap-5",
-            width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
-            placeholder: $( this ).data( 'placeholder' ),
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+            placeholder: $(this).data('placeholder'),
             closeOnSelect: false,
         });
 
@@ -87,4 +91,16 @@
         document.getElementById('eventDate').setAttribute('min', today);
     });
 </script>
+<script>
+    function addAvailability() {
+        var container = document.getElementById('availabilityInputs');
+        var newInput = document.createElement('input');
+        newInput.type = 'date';
+        newInput.className = 'form-control mt-2';
+        newInput.name = 'availability[]';
+        newInput.required = true;
+        container.appendChild(newInput);
+    }
+</script>
+
 {% endblock %}
