@@ -1,6 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for
+from flask_wtf import FlaskForm
+from wtforms import HiddenField, SubmitField
+from wtforms.validators import DataRequired
+from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0b\xb9\xa5\xb6\xd7.\xc3'
+csrf = CSRFProtect(app)
 
 # just sample until DB
 states = [
@@ -11,6 +17,41 @@ states = [
 #sample until DB
 skills = [
     'Skill 1', 'Skill 2', 'Skill 3', 'Skill 4', 'Skill 5'
+]
+
+# Sample data
+volunteers = [
+    {
+        'id': 1,
+        'name': 'John Doe',
+        'skills': 'Communication, Time management, Leadership'
+    },
+    {
+        'id': 2,
+        'name': 'John Smith',
+        'skills': 'Communication, Time management'
+    }
+]
+
+events = [
+    {
+        'id': 1,
+        'event_name': 'Early Voting',
+        'event_description': 'Early voting for the upcoming elections',
+        'location': 'Houston, TX (77490)',
+        'event_time': '6:30 PM - 9:30 PM',
+        'urgency': 2,
+        'required_skills': 'Communication, Time management, Leadership'
+    },
+    {
+        'id': 2,
+        'event_name': 'Food Drive',
+        'event_description': 'Food drive for people in need',
+        'location': 'Houston, TX (73031)',
+        'event_time': '3:30 PM - 7:30 PM',
+        'urgency': 1,
+        'required_skills': 'Communication, Time management'
+    }
 ]
 
 @app.route("/")
@@ -90,16 +131,59 @@ def eventManager():
 def event():
     return render_template("event.html")
 
-@app.route("/volunteer")
-def volunteer():
-    return render_template("volunteerMatching.html")
+class EventSelectionForm(FlaskForm):
+    event_name = HiddenField('Event Name', validators=[DataRequired()])
+    submit = SubmitField('Select Event')
 
-@app.route("/admin")
+class VolunteerSelectionForm(FlaskForm):
+    volunteer_id = HiddenField('Volunteer ID', validators=[DataRequired()])
+    submit = SubmitField('Select Volunteer')
+
+def match_volunteers_to_events(volunteers, events):
+    matches = []
+    for event in events:
+        required_skills = set(event['required_skills'].split(', '))
+        for volunteer in volunteers:
+            volunteer_skills = set(volunteer['skills'].split(', '))
+            if required_skills.issubset(volunteer_skills):
+                matches.append((volunteer, event))
+    return matches
+
+@app.route("/volunteer", methods=['GET', 'POST'])
+def volunteer():
+    form = EventSelectionForm()
+    volunteer = volunteers[0]  # Simulating fetching from DB
+    matches = match_volunteers_to_events(volunteers, events)
+    matched_events = [match[1] for match in matches if match[0] == volunteer]
+    success_message = None
+
+    if form.validate_on_submit():
+        event_name = form.event_name.data
+        success_message = f'Successfully matched with event: {event_name}'
+
+    return render_template("volunteerMatching.html", volunteer=volunteer, events=matched_events, form=form, success_message=success_message)
+
+@app.route("/admin", methods=['GET', 'POST'])
 def admin():
-    return render_template("adminMatching.html")
+    form = VolunteerSelectionForm()
+    selected_event = events[0]  # For this example, we assume the admin is working with the first event
+    matches = match_volunteers_to_events(volunteers, events)
+    matched_volunteers = [match[0] for match in matches if match[1] == selected_event]
+    success_message = None
+
+    if form.validate_on_submit():
+        volunteer_id = form.volunteer_id.data
+        selected_volunteer = next((v for v in volunteers if str(v['id']) == volunteer_id), None)
+        success_message = f'Successfully matched volunteer: {selected_volunteer["name"]} for the event: {selected_event["event_name"]}'
+
+    return render_template("adminMatching.html", event=selected_event, volunteers=matched_volunteers, form=form, success_message=success_message)
+
 
 @app.route("/history")
 def history():
-    return render_template("history.html")
+    volunteer = volunteers[0]  
+    history = [event for event in event_history if event['volunteer_id'] == volunteer['id']]
+    
+    return render_template("history.html", volunteer=volunteer, history=history)
 
 if __name__ == '__main__': app.run(host='0.0.0.0', debug=True) # starts server

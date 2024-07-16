@@ -14,9 +14,9 @@
 
     <div class="text-center border border-info rounded" style="width: 50%; margin-left: 25%;">
       <b>Name:</b>
-      <p>John Doe</p>
+      <p>{{ volunteer.name }}</p>
       <b>Skills:</b>
-      <p>Communication, Time management, Leadership</p>
+      <p>{{ volunteer.skills }}</p>
     </div>  
       
 
@@ -41,24 +41,17 @@
               </tr>
             </thead>
             <tbody>
+              {% for event in history %}
               <tr class="text-center">
-                  <td>Early Voting</td>
-                  <td>Helping voters at the polls</td>
-                  <td>Houston, TX (77490)</td>
-                  <td>Communication, Time management, Leadership</td>
-                  <td>2</td>
-                  <td>10/24/2024</td>
-                  <td>Complete</td>
+                <td>{{ event.event_name }}</td>
+                <td>{{ event.event_description }}</td>
+                <td>{{ event.location }}</td>
+                <td>{{ event.required_skills }}</td>
+                <td>{{ event.urgency }}</td>
+                <td>{{ event.event_date }}</td>
+                <td>{{ event.participation_status }}</td>
               </tr>
-              <tr class="text-center">
-                  <td>Food Drive</td>
-                  <td>Food drive for people in need</td>
-                  <td>Houston, TX (73031)</td>
-                  <td>Communication, Time management, Leadership</td>
-                  <td>1</td>
-                  <td>12/13/2024</td>
-                  <td>In Progress</td>
-              </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
