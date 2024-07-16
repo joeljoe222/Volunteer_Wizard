@@ -2,23 +2,40 @@
 
 <div class="container">
 	<div class="col-md-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
-		<h2>Notification</h2>
-		<form method="POST">
+		<h2>Create Notification</h2>
+		<form method="POST" action="{{url_for('notification')}}">
+			{{ form.hidden_tag() }}
+
 			<div class="row g-2">
 				<div class="row-sm-6">
-					<label for="notif_name" class="form-label"> Notification Name </label>                            
-					<input type="text" class="form-control" id="notif_name" name="notif_name" maxlength="100">
-					<!--<small id="eventNameHelp" class="form-text text-muted">Max 100 characters. <span id="charCount">0</span>/100</small>-->
-				</div>
+					{{ form.notifName.label(class='form-control-label') }}
+					{{ form.notifName(class='form-control', placeholder='Notification Title') }}
+					{% for error in form.notifName.errors %}
+						<div class="text-danger">{{ error }}</div>
+					{% endfor %}
 				<div class="row-sm-6">
-					<label for="notif_desc" class="form-label"> Message </label>
-					<textarea class="form-control" id="notif_desc" placeholder="Notify your volunteers of any update new or any new assignments that need to get completes or a simple reminder" name="notif_desc" required></textarea>
+					{{ form.notifDesc.label(class='form-control-label') }}
+					{{ form.notifDesc(class='form-control', placeholder='Notification Details') }}
+					{% for error in form.notifName.errors %}
+						<div class="text-danger">{{ error }}</div>
+					{% endfor %}
 				</div>
 			</div>
-			<div class="pt-3">
-				<button class="w-100 btn btn-primary btn-lg" type="submit">Create Notification</button>
+			<div class="py-2">
+				{{ form.submit(class='w-100 btn btn-primary btn-lg')}}
 			</div>
 		</form>
+
+		{% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-success">
+                    {% for category, message in messages %}
+                        <div>{{ message|safe }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
 	</div>
 </div>
 {% endblock %}

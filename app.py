@@ -1,6 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
+from forms import NotificationForm
+
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret_key'
 
 # just sample until DB
 states = [
@@ -56,18 +59,24 @@ def profile():
 
 @app.route("/notificationSystem")
 def notificationManager():
-    return render_template("notificationSystem.html");
+    return render_template("notificationSystem.html")
 
 
 @app.route("/notification", methods=['GET','POST'])
 def notification():
-    if request.method == 'POST':
-
-        notifName = request.form['notifName']
-        notifDesc = request.form['notifDesc']
-
-        return "Notification Created"
-    return render_template("notification.html");
+    notifName = None
+    notifDesc = None
+    form = NotificationForm()
+    if form.validate_on_submit():
+        notifName = form.notifName.data
+        notifDesc = form.notifDesc.data
+        
+        flash(f'Notification Sent! : {form.notifName.data} <br> {form.notifDesc.data}','success')
+        
+        form.notifName.data = ''
+        form.notifDesc.data = ''
+        return redirect(url_for('notification'))
+    return render_template('notification.html', notifName = notifName, notifDesc = notifDesc, form=form)
 
 @app.route("/eventManager", methods=['GET','POST'])
 def eventManager():
@@ -84,7 +93,7 @@ def eventManager():
         requiredSkills = request.form['requiredSkills']
 
         return "Event created/updated"
-    return render_template("eventManager.html");
+    return render_template("eventManager.html")
 
 @app.route("/event")
 def event():
