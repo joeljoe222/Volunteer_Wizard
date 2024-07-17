@@ -1,41 +1,43 @@
 {% extends 'base.html' %} {% block content %}
 
 <div class="container">
-	<div class="col-md-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
-		<h2>Create Notification</h2>
-		<form method="POST" action="{{url_for('notification')}}">
-			{{ form.hidden_tag() }}
+	<main>
+		<div class="col-md-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
+			<h2>Create Notification</h2>
+			<form method="POST" action="{{url_for('notification')}}">
+				{{ form.hidden_tag() }}
 
-			<div class="row g-2">
-				<div class="row-sm-6">
-					{{ form.notifName.label(class='form-control-label') }}
-					{{ form.notifName(class='form-control', placeholder='Notification Title') }}
-					{% for error in form.notifName.errors %}
-						<div class="text-danger">{{ error }}</div>
-					{% endfor %}
-				<div class="row-sm-6">
-					{{ form.notifDesc.label(class='form-control-label') }}
-					{{ form.notifDesc(class='form-control', placeholder='Notification Details') }}
-					{% for error in form.notifName.errors %}
-						<div class="text-danger">{{ error }}</div>
-					{% endfor %}
+				<div class="row g-2">
+					<div class="row-sm-6">
+						{{ form.notifName.label(class='form-control-label') }}
+						{{ form.notifName(class='form-control', placeholder='Notification Title') }}
+						{% for error in form.notifName.errors %}
+							<div class="text-danger">{{ error }}</div>
+						{% endfor %}
+					<div class="row-sm-6">
+						{{ form.notifDesc.label(class='form-control-label') }}
+						{{ form.notifDesc(class='form-control', placeholder='Notification Details') }}
+						{% for error in form.notifName.errors %}
+							<div class="text-danger">{{ error }}</div>
+						{% endfor %}
+					</div>
 				</div>
-			</div>
-			<div class="py-2">
-				{{ form.submit(class='w-100 btn btn-primary btn-lg')}}
-			</div>
-		</form>
+				<div class="py-2">
+					{{ form.submit(class='w-100 btn btn-primary btn-lg')}}
+				</div>
+			</form>
 
-		{% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="alert alert-success">
-                    {% for category, message in messages %}
-                        <div>{{ message|safe }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
+			{% with messages = get_flashed_messages(with_categories=true) %}
+				{% if messages %}
+					<div class="alert alert-success">
+						{% for category, message in messages %}
+							<div>{{ message|safe }}</div>
+						{% endfor %}
+					</div>
+				{% endif %}
+			{% endwith %}
 
-	</div>
+		</div>
+	</main>
 </div>
 {% endblock %}
