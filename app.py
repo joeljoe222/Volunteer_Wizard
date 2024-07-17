@@ -74,8 +74,7 @@ events = [
 
 @app.route("/")
 def index():
-    return render_template("index.html")
-
+    return render_template("index.html", volunteers=volunteers)
 @app.route("/about") # flask url_for 
 def about():
     return render_template("about.html")
@@ -206,8 +205,11 @@ def volunteer():
     return render_template("volunteerMatching.html", volunteer=volunteer, events=matched_events, form=form, success_message=success_message)
 
 
-@app.route("/History")
-def history():
-    return render_template("history.html")
+@app.route("/history/<int:volunteer_id>")
+def history(volunteer_id):
+    volunteer = next((v for v in volunteers if v['id'] == volunteer_id), None)
+    volunteer_events = [event for event in events if event['volunteer_id'] == volunteer_id]
+    return render_template("history.html", volunteer=volunteer, events=volunteer_events)
+
 
 if __name__ == '__main__': app.run(host='0.0.0.0', debug=True) # starts server
