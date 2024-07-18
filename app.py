@@ -11,31 +11,40 @@ app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0
 csrf = CSRFProtect(app)
 
 
-
 #TODO LIST for Jay Mejia :
 #make event seen from events page and update as edits are made
 #do the same with notification page
-#change all varibles and functions to snake_case
-#change html urls to be event-page
-#comment all work
+
+#Clarify and cleaning up code : This is a suggestion just to clean up our code and maintain readability, these are based of suggestions for each language
+#Do not abbreviate and comment your code
+#   Python:
+#       change all variables and functions to snake_case
+#       change all classes to CamelCase
+#       constants are capatilized MAX_ATTEMPTS
+#   HTML:
+#       change URLs to use dashes event-main, event-create
+
+
+
+#HARDCODED DATA FOR ASSIGNMENT 3
 
 #Example Event
 event_data = {
-    'eventName':'Example Event',
-    'eventDesc':'Here is where an Admin would write a description for the Event',
-    'eventDate':datetime.date(2024, 7, 24),
-    'urgency':'1',
-    'eventAddress':'404 Street Name',
-    'country':'USA',
-    'state':'TX',
-    'zipcode':'11220',
-    'requiredSkills':['a','c']
+    'event_name':'Example Event Name',
+    'event_description':'Here is a description for the Example Event',
+    'event_date':datetime.date(2024, 7, 24),
+    'urgency':'3',
+    'event_address':'1111 Street Name',
+    'event_country':'USA',
+    'event_state':'TX',
+    'event_zipcode':'10101',
+    'required_skills':['a','c']
 }
 
 #Example Notification
 notification_data = {
-    'notifName':'Notification Title',
-    'notifDesc':'This is where the main notification information will be'
+    'notification_name':'Notification Title',
+    'notification_description':'This is where the main notification information will be'
 }
 
 
@@ -103,9 +112,12 @@ events = [
     }
 ]
 
+#All pages involved in Application
+
 @app.route("/")
 def index():
     return render_template("index.html", volunteers=volunteers)
+
 @app.route("/about") # flask url_for 
 def about():
     return render_template("about.html")
@@ -143,80 +155,85 @@ def profile():
         return "Profile successfully updated!"
     return render_template("profile.html", states=states, skills=skills)
 
-@app.route("/notificationSystem")
-def notificationManager():
-    return render_template("notificationSystem.html")
+
+#NOTIFICATION SYSTEM
+@app.route("/notification-main")
+def notification_main():
+    return render_template("notification-main.html")
 
 
-@app.route("/notification", methods=['GET','POST'])
-def notification():
+@app.route("/notification-create", methods=['GET','POST'])
+def notification_create():
     form = NotificationForm()
     if form.validate_on_submit():
-        notification_data['notifName'] = form.notifName.data
-        notification_data['notifDesc'] = form.notifDesc.data
+        notification_data['notification_name'] = form.notification_name.data
+        notification_data['notification_description'] = form.notification_description.data
         
-        flash(f'Notification Sent! : {form.notifName.data} <br> {form.notifDesc.data}','success')
+        flash(f'Notification Sent! : {form.notification_name.data} <br> {form.notification_description.data}','success')
         
-        return redirect(url_for('notification'))
-    return render_template('notification.html', form=form)
+        return redirect(url_for('notification_create'))
+    return render_template('notification-create.html', form=form)
 
-@app.route("/eventCreator", methods=['GET','POST'])
-def eventCreator():
+
+#EVENT SYSTEM
+@app.route("/event-main")
+def event():
+    return render_template("event-main.html")
+
+@app.route("/event-create", methods=['GET','POST'])
+def event_create():
     form = EventCreateForm()
     if form.validate_on_submit():
-        eventName = form.eventName.data
-        eventDesc = form.eventDesc.data
-        eventDate = form.eventDate.data
+        event_name = form.event_name.data
+        event_description = form.event_description.data
+        event_date = form.event_date.data
         urgency = form.urgency.data
-        eventAddress = form.eventAddress.data
-        country = form.country.data
-        state = form.state.data
-        zipcode = form.zipcode.data
-        requiredSkills = form.requiredSkills.data
+        event_address = form.event_address.data
+        event_country = form.event_country.data
+        event_state = form.event_state.data
+        event_zipcode = form.event_zipcode.data
+        required_skills = form.required_skills.data
 
-        flash(f'The Event : {form.eventName.data} has been successfully created','success')
+        flash(f'The Event : {form.event_name.data} has been successfully created','success')
 
         form = EventCreateForm()
         
-        return redirect(url_for('eventCreator'))
-    return render_template("eventCreator.html", form=form)
+        return redirect(url_for('event_create'))
+    return render_template("event-create.html", form=form)
 
-@app.route("/eventManager", methods=['GET','POST'])
-def eventManager():
+@app.route("/event-manage", methods=['GET','POST'])
+def event_manage():
     form = EventManageForm(obj=event_data)
-    #form.eventName.data = event_data['eventName']
+    #form.event_name.data = event_data['event_name']
     if request.method == 'GET':
-        form.eventName.data = event_data['eventName']
-        form.eventDesc.data = event_data['eventDesc']
-        form.eventDate.data = event_data['eventDate']
+        form.event_name.data = event_data['event_name']
+        form.event_description.data = event_data['event_description']
+        form.event_date.data = event_data['event_date']
         form.urgency.data = event_data['urgency']
-        form.eventAddress.data = event_data['eventAddress']
-        form.country.data = event_data['country']
-        form.state.data = event_data['state']
-        form.zipcode.data = event_data['zipcode']
-        form.requiredSkills.data = event_data['requiredSkills']
+        form.event_address.data = event_data['event_address']
+        form.event_country.data = event_data['event_country']
+        form.event_state.data = event_data['event_state']
+        form.event_zipcode.data = event_data['event_zipcode']
+        form.required_skills.data = event_data['required_skills']
     if form.validate_on_submit():
         #form.populate_obj(event_data)
-        event_data['eventName'] = form.eventName.data
-        event_data['eventDesc'] = form.eventDesc.data
-        event_data['eventDate'] = form.eventDate.data
+        event_data['event_name'] = form.event_name.data
+        event_data['event_description'] = form.event_description.data
+        event_data['event_date'] = form.event_date.data
         event_data['urgency'] = form.urgency.data
-        event_data['eventAddress'] = form.eventAddress.data
-        event_data['country'] = form.country.data
-        event_data['state'] = form.state.data
-        event_data['zipcode'] = form.zipcode.data
-        event_data['requiredSkills'] = form.requiredSkills.data
+        event_data['event_address'] = form.event_address.data
+        event_data['event_country'] = form.event_country.data
+        event_data['event_state'] = form.event_state.data
+        event_data['event_zipcode'] = form.event_zipcode.data
+        event_data['required_skills'] = form.required_skills.data
 
-        flash(f'The Event : {form.eventName.data} has been successfully updated','success')
-        return redirect(url_for('eventManager'))
+        flash(f'The Event : {form.event_name.data} has been successfully updated','success')
+        return redirect(url_for('event_manage'))
     print("Event Data: ", event_data)
     print("Form Data: ", form.data)
 
-    return render_template("eventManager.html", form=form, event=event_data)
+    return render_template("event-manage.html", form=form, event=event_data)
 
-@app.route("/event")
-def event():
-    return render_template("event.html")
 
 class EventSelectionForm(FlaskForm):
     event_id = HiddenField('Event ID', validators=[DataRequired()])
