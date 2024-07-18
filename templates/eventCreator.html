@@ -3,8 +3,8 @@
 <div class="container">
     <main>
         <div class="col-md-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
-            <h2>Manage Event</h2>
-            <form method="POST" action="{{url_for('eventManager')}}">
+            <h2>Create Event</h2>
+            <form method="POST" action="{{url_for('eventCreator')}}">
                 {{ form.hidden_tag() }}
 
 
@@ -99,20 +99,6 @@
                     {{form.submit(class='w-100 btn btn-primary btn-lg')}}
                 </div>
             </form>
-
-            <!-- Display current event data -->
-            <h3>Current Event Data:</h3>
-            <ul>
-                <li>Name: {{ event['eventName'] }}</li>
-                <li>Description: {{ event['eventDesc'] }}</li>
-                <li>Date: {{ event['eventDate'] }}</li>
-                <li>Urgency: {{ event['urgency'] }}</li>
-                <li>Address: {{ event['eventAddress'] }}</li>
-                <li>Country: {{ event['country'] }}</li>
-                <li>State: {{ event['state'] }}</li>
-                <li>Zipcode: {{ event['zipcode'] }}</li>
-                <li>Required Skills: {{ event['requiredSkills'] | join(', ') }}</li>
-            </ul>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
