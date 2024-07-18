@@ -211,5 +211,14 @@ def history(volunteer_id):
     volunteer_events = [event for event in events if event['volunteer_id'] == volunteer_id]
     return render_template("history.html", volunteer=volunteer, events=volunteer_events)
 
+class PricingModule:
+    def __init__(self):
+        self.prices = {}
+
+    def set_price(self, item, price):
+        self.prices[item] = price
+
+    def get_price(self, item):
+        return self.prices.get(item, None)
 
 if __name__ == '__main__': app.run(host='0.0.0.0', debug=True) # starts server
