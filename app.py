@@ -1,9 +1,36 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from forms import NotificationForm, EventForm
+from forms import NotificationForm, EventCreateForm, EventManageForm
+import datetime
 
+#TODO LIST :
+#stallmake event seen from events page and update as edits are made
+#do the same with notification page
+#change all varibles and functions to snake_case
+#change html urls to be event-page
+#comment all work
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret_key'
+
+
+#Example Event
+event_data = {
+    'eventName':'Example Event',
+    'eventDesc':'Here is where an Admin would write a description for the Event',
+    'eventDate':datetime.date(2024, 7, 24),
+    'urgency':'1',
+    'eventAddress':'404 Street Name',
+    'country':'USA',
+    'state':'TX',
+    'zipcode':'11220',
+    'requiredSkills':['a','c']
+}
+
+#Example Notification
+notification_data = {
+    'notifName':'Notification Title',
+    'notifDesc':'This is where the main notification information will be'
+}
 
 # just sample until DB
 states = [
@@ -66,23 +93,18 @@ def notificationManager():
 def notification():
     form = NotificationForm()
     if form.validate_on_submit():
-        notifName = form.notifName.data
-        notifDesc = form.notifDesc.data
+        notification_data['notifName'] = form.notifName.data
+        notification_data['notifDesc'] = form.notifDesc.data
         
         flash(f'Notification Sent! : {form.notifName.data} <br> {form.notifDesc.data}','success')
         
         return redirect(url_for('notification'))
-    else:
-        print('notif failed validation')
-        print(form.errors)
     return render_template('notification.html', form=form)
 
-@app.route("/eventManager", methods=['GET','POST'])
-def eventManager():
-    form = EventForm()
+@app.route("/eventCreator", methods=['GET','POST'])
+def eventCreator():
+    form = EventCreateForm()
     if form.validate_on_submit():
-        print('Event Form Validated')
-
         eventName = form.eventName.data
         eventDesc = form.eventDesc.data
         eventDate = form.eventDate.data
@@ -93,17 +115,45 @@ def eventManager():
         zipcode = form.zipcode.data
         requiredSkills = form.requiredSkills.data
 
-        flash(f'The Event : {form.eventName.data} has been successfully updated','success')
-        
-        print('Event Flash')
+        flash(f'The Event : {form.eventName.data} has been successfully created','success')
 
-        form = EventForm()
+        form = EventCreateForm()
         
+        return redirect(url_for('eventCreator'))
+    return render_template("eventCreator.html", form=form)
+
+@app.route("/eventManager", methods=['GET','POST'])
+def eventManager():
+    form = EventManageForm(obj=event_data)
+    #form.eventName.data = event_data['eventName']
+    if request.method == 'GET':
+        form.eventName.data = event_data['eventName']
+        form.eventDesc.data = event_data['eventDesc']
+        form.eventDate.data = event_data['eventDate']
+        form.urgency.data = event_data['urgency']
+        form.eventAddress.data = event_data['eventAddress']
+        form.country.data = event_data['country']
+        form.state.data = event_data['state']
+        form.zipcode.data = event_data['zipcode']
+        form.requiredSkills.data = event_data['requiredSkills']
+    if form.validate_on_submit():
+        #form.populate_obj(event_data)
+        event_data['eventName'] = form.eventName.data
+        event_data['eventDesc'] = form.eventDesc.data
+        event_data['eventDate'] = form.eventDate.data
+        event_data['urgency'] = form.urgency.data
+        event_data['eventAddress'] = form.eventAddress.data
+        event_data['country'] = form.country.data
+        event_data['state'] = form.state.data
+        event_data['zipcode'] = form.zipcode.data
+        event_data['requiredSkills'] = form.requiredSkills.data
+
+        flash(f'The Event : {form.eventName.data} has been successfully updated','success')
         return redirect(url_for('eventManager'))
-    else:
-        print('Event did NOT validate')
-        print(form.errors)
-    return render_template("eventManager.html", form=form)
+    print("Event Data: ", event_data)
+    print("Form Data: ", form.data)
+
+    return render_template("eventManager.html", form=form, event=event_data)
 
 @app.route("/event")
 def event():
