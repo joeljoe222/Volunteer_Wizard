@@ -62,3 +62,4 @@ class EventManageForm(FlaskForm):
     event_zipcode = StringField('Zipcode', validators=[DataRequired(), Length(min=5, max=10)])
     required_skills = SelectMultipleField('Required Skills', validators=[DataRequired()], choices=skills)
     submit = SubmitField('Update Event')
+

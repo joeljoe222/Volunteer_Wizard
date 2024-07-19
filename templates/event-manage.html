@@ -4,7 +4,7 @@
     <main>
         <div class="col-md-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
             <h2>Manage Event</h2>
-            <form method="POST" action="{{url_for('event_manage')}}">
+            <form method="POST" action="{{url_for('event_manage', event_id=event_id)}}">
                 {{ form.hidden_tag() }}
 
 
@@ -101,18 +101,18 @@
             </form>
 
             <!-- Display current event data -->
-            <h3>Current Event Data:</h3>
+            <!--<h3>Current Event Data:</h3>
             <ul>
-                <li>Name: {{ event['event_name'] }}</li>
-                <li>Description: {{ event['event_description'] }}</li>
-                <li>Date: {{ event['event_date'] }}</li>
-                <li>Urgency: {{ event['urgency'] }}</li>
-                <li>Address: {{ event['event_address'] }}</li>
-                <li>Country: {{ event['event_country'] }}</li>
-                <li>State: {{ event['event_state'] }}</li>
-                <li>Zipcode: {{ event['event_zipcode'] }}</li>
-                <li>Required Skills: {{ event['required_skills'] | join(', ') }}</li>
-            </ul>
+                <li>Name: {{ event.get(1)['event_name'] }}</li>
+                <li>Description: {{ event.get(1)['event_description'] }}</li>
+                <li>Date: {{ event.get(1)['event_date'] }}</li>
+                <li>Urgency: {{ event.get(1)['urgency'] }}</li>
+                <li>Address: {{ event.get(1)['event_address'] }}</li>
+                <li>Country: {{ event.get(1)['event_country'] }}</li>
+                <li>State: {{ event.get(1)['event_state'] }}</li>
+                <li>Zipcode: {{ event.get(1)['event_zipcode'] }}</li>
+                <li>Required Skills: {{ event.get(1)['required_skills'] | join(', ') }}</li>
+            </ul>-->
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
