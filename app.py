@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, abort
+from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
 from flask_wtf import FlaskForm
-from wtforms import HiddenField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms import HiddenField, SubmitField, StringField, PasswordField, EmailField, SelectField
+from wtforms.validators import DataRequired, Email, Length, ValidationError
 from flask_wtf.csrf import CSRFProtect
 from forms import NotificationForm, EventCreateForm, EventManageForm
 import datetime
+# >>>>>>> main
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0b\xb9\xa5\xb6\xd7.\xc3'
@@ -70,15 +71,33 @@ notification_data = {
 }
 
 
-# just sample until DB
+app.config['SECRET_KEY'] = "kia"
+
+# Form Class
+class RegisterForm(FlaskForm):
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    role = SelectField('Role', choices=[('1', 'Volunteer'), ('2', 'Administrator')], validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+class LoginForm(FlaskForm):
+    email = EmailField('Email', validators=[DataRequired(),Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    submit = SubmitField('Login')
+
+
+# add more in DB when pulling data from there
 states = [
     {'code': 'AL', 'name': 'Alabama'},
     {'code': 'AK', 'name': 'Alaska'},
-    
+    {'code': 'AZ', 'name': 'Arizona'},
+    {'code': 'AR', 'name': 'Arkansas'},
+    {'code': 'CA', 'name': 'California'},
+    {'code': 'CO', 'name': 'Colorado'},
 ]
 #sample until DB
 skills = [
-    'Skill 1', 'Skill 2', 'Skill 3', 'Skill 4', 'Skill 5'
+    'Planning and scheduling', 'Problem-solving', 'IT support', 'Photography', 'Workshop facilitation'
 ]
 
 # Sample data
@@ -136,9 +155,31 @@ events = [
 
 #All pages involved in Application
 
+users = {}
+profiles = {}
+
 @app.route("/")
 def index():
-    return render_template("index.html", volunteers=volunteers)
+    form = LoginForm()
+    return render_template("index.html", form = form)
+
+@app.route("/login", methods=['POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
+        user = users.get(email)
+        
+        if user and user['password'] == password:
+            session['email'] = email
+            flash(f"Welcome back, {profiles[email]['full_name']}!", "success")
+            return redirect(url_for('profile',email=email))
+        else:
+            flash("Invalid email or password.", "danger")
+    
+    return render_template("index.html", form=form)
+#>>>>>>> main
 
 @app.route("/about") # flask url_for 
 def about():
@@ -146,19 +187,19 @@ def about():
 
 @app.route("/register", methods=['GET','POST'])
 def register():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        role = request.form['role']
+    form = RegisterForm()
+    if form.validate_on_submit(): #validating
+        email = form.email.data
+        password = form.password.data
+        role = form.role.data
         
-        #save to db here later
-       
-        return redirect(url_for('profile'))
+        users[email] = {'password': password, 'role': role} # storing
+        return redirect(url_for('profile',email=email))
 
-    return render_template("register.html")
+    return render_template("register.html", form=form)
 
-@app.route("/profile", methods=['GET','POST'])
-def profile():
+@app.route("/profile/<email>", methods=['GET', 'POST'])
+def profile(email):
     # captures data entered from profile.html
     if request.method == 'POST':
 
@@ -173,9 +214,20 @@ def profile():
         availability_dates = request.form.getlist('availability[]')
 
         # save to database add later
+        profiles[email] = {
+            'full_name': full_name,
+            'address1': address1,
+            'address2': address2,
+            'city': city,
+            'state': state,
+            'zip_code': zip_code,
+            'skills': skills_selected,
+            'preferences': preferences,
+            'availability': availability_dates
+        }
 
-        return "Profile successfully updated!"
-    return render_template("profile.html", states=states, skills=skills)
+        return redirect(url_for('index')) # place holder
+    return render_template("profile.html", states=states, skills=skills, email=email)
 
 
 #NOTIFICATION SYSTEM -----------------------------------------------------------
