@@ -29,16 +29,21 @@
                         <a class="nav-link" href="{{url_for('register')}}">Register</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('event')}}">Event Page</a>
+                        <a class="nav-link" href="{{url_for('event_main')}}">Event Page</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('eventManager')}}">Manage Event</a>
+                        <a class="nav-link" href="{{url_for('event_create')}}">Create Event</a>
+                    </li>
+                    <!--
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('event_manage', event_id=1)}}">Manage Event</a>
+                    </li>
+                    -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('notification_main')}}">Notifications Page</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('notificationManager')}}">Notification Page</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('notification')}}">Make a Notification</a>
+                        <a class="nav-link" href="{{url_for('notification_create')}}">Create Notification</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{url_for('volunteer')}}">Volunteer Page</a>
@@ -47,7 +52,7 @@
                         <a class="nav-link" href="{{url_for('admin')}}">Admin Page</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('history')}}">Volunteer History</a>
+                        <a class="nav-link" href="{{ url_for('history', volunteer_id=1) }}">Volunteer History</a>
                     </li>
                     <!--
                     <li class="nav-item dropdown">
