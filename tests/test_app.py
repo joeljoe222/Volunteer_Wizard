@@ -10,13 +10,11 @@ def client():
         yield client
 
 def test_index(client):
-    """Test the index page (login)."""
     response = client.get('/')
     assert response.status_code == 200
     assert b'Login' in response.data
 
 def test_register(client):
-    """Test user registration."""
     response = client.post('/register', data={
         'email': 'test@example.com',
         'password': 'testpassword',
@@ -26,7 +24,6 @@ def test_register(client):
     assert b'Profile successfully updated!' not in response.data
 
 def test_login(client):
-    """Test user login."""
     # Register a user first
     client.post('/register', data={
         'email': 'test@example.com',
@@ -43,9 +40,7 @@ def test_login(client):
     assert b'Welcome back' in response.data
 
 def test_profile_update(client):
-    """Test profile update."""
-    # Register and login the user
-    client.post('/register', data={
+    client.post('/register', data={     # Register and login the user
         'email': 'test@example.com',
         'password': 'testpassword',
         'role': '1'
@@ -71,12 +66,10 @@ def test_profile_update(client):
     assert 'Test User' in profiles['test@example.com']['full_name']
 
 def test_validation(client):
-    """Test form validation (missing required fields)."""
     response = client.post('/register', data={})
     assert b'This field is required' in response.data
 
 def test_about_page(client):
-    """Test the about page."""
     response = client.get('/about')
     assert response.status_code == 200
     assert b'About' in response.data
