@@ -31,8 +31,19 @@
 								{% endfor %}
 							</li>
 						</ul>
-						
 					</div>
+
+					<h1 class="'col">Notifications</h1>
+					<ul class="list-group">
+						{% for notification_id, notification in notification.items() %}
+							<li class="list-group-item">
+								<h5>{{ notification['notification_name'] }}</h5>
+								<p>{{ notification['notification_description'] }}</p>
+							</li>
+						{% endfor %}
+					</ul>
+	
+
 					<div class="row py-2">
 						<div class="col">
 							<a href="{{ url_for('event_manage', event_id=event_id) }}" class="btn btn-primary w-100">Manage Event</a>
