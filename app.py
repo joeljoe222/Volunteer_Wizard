@@ -9,7 +9,7 @@ import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0b\xb9\xa5\xb6\xd7.\xc3'
-csrf = CSRFProtect(app)
+
 
 
 #TODO LIST for Jay Mejia :
