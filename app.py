@@ -4,13 +4,29 @@ from wtforms import HiddenField, SubmitField, StringField, PasswordField, EmailF
 from wtforms.validators import DataRequired, Email, Length, ValidationError
 from flask_wtf.csrf import CSRFProtect
 from forms import NotificationForm, EventCreateForm, EventManageForm
-import datetime
+from flask_sqlalchemy import SQLAlchemy 
+from datetime import datetime  # Import the datetime class
 # >>>>>>> main
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0b\xb9\xa5\xb6\xd7.\xc3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+db = SQLAlchemy(app)
 
+#database model, still in progress
+class Users(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+    password = db.Column(db.String(50), nullable=False)
+    role = db.Column(db.String(50), nullable=False)
+    address = db.Column(db.String(200), nullable=False)
+    skills = db.Column(db.String(100), nullable=False)
+    preferencess = db.Column(db.String(200))
+    availability = db.Column(db.String(500), nullable=False)
 
+    def _repr_(self):
+        return '<Name %r>' % self.id
 
 #TODO LIST for Jay Mejia :
 #make NOTIFICATIONS seen from notification page and update as more are added
@@ -37,7 +53,7 @@ event_data = {
     1 : {
         'event_name':'Example Event One',
         'event_description':'Description for Event One',
-        'event_date':datetime.date(2025, 1, 1),
+        #'event_date':datetime.date(2025, 1, 1),
         'urgency':'1',
         'event_address':'1111 Street Name',
         'event_country':'USA',
@@ -48,7 +64,7 @@ event_data = {
     2 : {
         'event_name':'Example Event Two',
         'event_description':'Description for Event Two',
-        'event_date':datetime.date(2025, 2, 2),
+        #'event_date':datetime.date(2025, 2, 2),
         'urgency':'2',
         'event_address':'2222 Street Name',
         'event_country':'USA',
@@ -71,7 +87,6 @@ notification_data = {
 }
 
 
-app.config['SECRET_KEY'] = "kia"
 
 # Form Class
 class RegisterForm(FlaskForm):
