@@ -7,54 +7,45 @@
                 <div class="row gx-2 p-2 bg-primary bg-opacity-25 border border-info rounded">
                     <h4>Reminders</h4>
                     <ul class="list-group">
-                        <li class="list-group-item">First Event Reminder</li>
-                        <li class="list-group-item">Second Event Reminder</li>
-                        <li class="list-group-item">Third Event Reminder</li>
-                        <li class="list-group-item">Fourth Event Reminder</li>
-                        <li class="list-group-item">Fifth Event Reminder</li>
+                        {% for event_id, notifications in notification_data.items() %}
+                            <li class="list-group-item">
+                                <h4><a href="{{ url_for('event_view', event_id=event_id) }}">Event {{ event_id }}</a></h4>
+                                <ul>
+                                            
+                                    
+                                        <li>
+                                            {{ notifications.get(1)['notification_name'] }}
+                                            <p>{{ notifications.get(1)['notification_description'] }}</p>
+                                        </li>
+                                    
+                                </ul>
+                            </li>
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
 
             <div class="col-md-7 col-lg-8 ">
-                <div class="row gx-2 p-2 bg-primary bg-opacity-25 border border-bottom-0 border-info rounded-top">
+                <div class="row gx-2 p-2 bg-primary bg-opacity-25 border border-info rounded">
                     <div>
-                        <h4>Updates</h4>
-                        <div class="col px-2 bg-light rounded">
-                            <h4></h4>
-                            <h4>Event Update 1</h4>
-                            <p>Notifications from event that has yet to be read by the volunteer. This could be an update on date location or maybe new shofts opening up or roles being availiable. Once the user clicks on this it will send them to the event
-                                page with all the notifications for said event and event info.</p>
-                        </div>
-
-                        <div class="col px-2 bg-light rounded">
-                            <h4>Event Update 2</h4>
-                            <p>Notifications from event that has yet to be read by the volunteer. This could be an update on date location or maybe new shofts opening up or roles being availiable. Once the user clicks on this it will send them to the event
-                                page with all the notifications for said event and event info.</p>
-                        </div>
-                        <div class="col px-2 bg-light rounded">
-                            <h4>Event Update 3</h4>
-                            <p>Notifications from event that has yet to be read by the volunteer. This could be an update on date location or maybe new shofts opening up or roles being availiable. Once the user clicks on this it will send them to the event
-                                page with all the notifications for said event and event info.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row gx-2 p-2 bg-primary bg-opacity-25 border border-info border-top-0 rounded-bottom">
-                    <div>
-                        <h4>Assignments</h4>
-                        <div class="col px-2 bg-light rounded">
-                            <h4>Event Name : Assignment</h4>
-                            <p>Assignments given by event managers to volunteers. These Tabs will have the date and time assignment is due at the top right corner. These are assignments already previously viewed by volunteer</p>
-                        </div>
-                        <div class="col px-2 bg-light rounded">
-                            <h4>Event Name : Assignment</h4>
-                            <p>Assignments given by event managers to volunteers. These Tabs will have the date and time assignment is due at the top right corner. These are assignments already previously viewed by volunteer</p>
-                        </div>
-                        <div class="col px-2 bg-light rounded">
-                            <h4>Event Name : Assignment</h4>
-                            <p>Assignments given by event managers to volunteers. These Tabs will have the date and time assignment is due at the top right corner. These are assignments already previously viewed by volunteer</p>
-                        </div>
+                        <h4>Notifications</h4>
+                        <ul class="list-group">
+                            <ul class="list-group">
+                                {% for event_id, notifications in notification_data.items() %}
+                                    <li class="list-group-item">
+                                        <h4><a href="{{ url_for('event_view', event_id=event_id) }}">Event {{ event_id }}</a></h4>
+                                        <ul>
+                                            {% for notification_id, notification in notifications.items() %}
+                                                <li>
+                                                    {{ notification['notification_name'] }}
+                                                    <p>{{ notification['notification_description'] }}</p>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </ul>
                     </div>
                 </div>
             </div>

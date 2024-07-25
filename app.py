@@ -33,7 +33,7 @@ class Users(db.Model):
 #make any event manage or view page with no index redirect to event page and flash error
 
 #I AM IN THE MIDDLE OF:
-#finished events pages and pushing a commit
+#making notification have multiple notifications per event
 
 #Clarify and cleaning up code : This is a suggestion just to clean up our code and maintain readability, these are based of suggestions for each language
 #Do not abbreviate and comment your code
@@ -82,8 +82,34 @@ skill_data = {
 
 #Example Notification
 notification_data = {
-    'notification_name':'Notification Title',
-    'notification_description':'This is where the main notification information will be'
+    1:{
+        1:{
+            'notification_name':'Notification ONE for Event ONE',
+            'notification_description':'Notification Description for Event ONE'
+        },
+        2:{
+            'notification_name':'Notification TWO for Event ONE',
+            'notification_description':'Notification Description for Event ONE'
+        }
+        
+    },
+    2:{
+        1:
+        {
+            'notification_name':'Notification ONE for Event TWO',
+            'notification_description':'Notification ONE Description for Event TWO'
+        },
+        2:
+        {
+            'notification_name':'Notification TWO for Event TWO',
+            'notification_description':'Notification TWO Description for Event TWO'
+        },
+        3:
+        {
+            'notification_name':'Notification THREE for Event TWO',
+            'notification_description':'Notification THREE Description for Event TWO'
+        }
+    }
 }
 
 
@@ -246,12 +272,13 @@ def profile(email):
 
 
 #NOTIFICATION SYSTEM -----------------------------------------------------------
-@app.route("/notification-main")
+@app.route("/notification")
 def notification_main():
-    return render_template("notification-main.html")
+    #notification = notification_data.get(event_id)
+    return render_template("notification-main.html", notification_data=notification_data)
 
 
-@app.route("/notification-create", methods=['GET','POST'])
+@app.route("/notification/create", methods=['GET','POST'])
 def notification_create():
     form = NotificationForm()
     if form.validate_on_submit():
@@ -268,6 +295,14 @@ def notification_create():
 @app.route("/event")
 def event_main():
     return render_template("event-main.html", event_data=event_data, skill_data=skill_data)
+
+@app.route("/event/<int:event_id>")
+def event_view(event_id):
+    event = event_data.get(event_id)
+    notification = notification_data.get(event_id)
+    if event is None:
+        abort(404) #Update to redirect to event not found page with a link back to event-main
+    return render_template("event-view.html", event=event, event_id=event_id, skill_data=skill_data, notification=notification)
 
 @app.route("/event/create", methods=['GET','POST'])
 def event_create():
@@ -324,12 +359,7 @@ def event_manage(event_id):
 
     return render_template("event-manage.html", form=form, event=event, event_id=event_id)
 
-@app.route("/event/<int:event_id>")
-def event_view(event_id):
-    event = event_data.get(event_id)
-    if event is None:
-        abort(404) #Update to redirect to event not found page with a link back to event-main
-    return render_template("event-view.html", event=event, event_id=event_id, skill_data=skill_data)
+
 
 
 
