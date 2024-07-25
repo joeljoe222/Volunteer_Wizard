@@ -21,14 +21,19 @@
                     <div>
                         <h4>Updates</h4>
                         <ul class="list-group">
-                            {% for event_id, event in notification_data.items() %}
+                            <!--{% for event_id, event in notification_data.items() %}
                                 {% for notification_id, notification in notification_data.get(event_id).items()%} 
-                                <!-- In the middle of outputting all notif in main notif page for each event-->
                                 <li class="list-group-item">
                                     <h5>{{ notification['notification_name'] }}</h5>
                                     <p>{{ notification['notification_description'] }}</p>
                                 </li>
-                            {% endfor %}
+                            {% endfor %}-->
+                            {% for notification_id, notification in notification_data.items() %}
+							<li class="list-group-item">
+								<h5>{{ notification.get(1)['notification_name'] }}</h5>
+								<p>{{ notification.get(1)['notification_description'] }}</p>
+							</li>
+						{% endfor %}
                         </ul>
                     </div>
                 </div>

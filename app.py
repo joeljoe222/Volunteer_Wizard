@@ -207,7 +207,8 @@ def profile():
 #NOTIFICATION SYSTEM -----------------------------------------------------------
 @app.route("/notification")
 def notification_main():
-    return render_template("notification-main.html", notification_data=notification_data)
+    #notification = notification_data.get(event_id)
+    return render_template("notcification-main.html", notification_data=notification_data)
 
 
 @app.route("/notification/create", methods=['GET','POST'])
