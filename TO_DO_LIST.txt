@@ -1,7 +1,6 @@
 ================================================================================
 	Files : Descriptions
 
-DB_AddSample	: Adds Sample data to already exisitng databases || Use to add and test more data
 DB_ClearAll		: Clears All Databases || Clear Databases if there are issues with DBs
 DB_ClearAll_AddSample	: Reinitializes Databases with Sample Databases || Good practice is to run this before Debugging
 ================================================================================
