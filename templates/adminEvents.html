@@ -13,27 +13,31 @@
     <br>
 </div>
 
-{% for event in events %}
-<div class="text-center border border-info table-info rounded" style="width: 50%; margin-left: 25%; margin-top: 20px; padding-bottom: 20px;">
-    <b>Event Name:</b>
-    <p>{{ event.event_name }}</p>
-    <b>Event Description:</b>
-    <p>{{ event.event_description }}</p>
-    <b>Event Location:</b>
-    <p>{{ event.location }}</p>
-    <b>Event Time:</b>
-    <p>{{ event.event_time }}</p>
-    <b>Urgency:</b>
-    <p>{{ event.urgency }}</p>
-    <b>Required Skills:</b>
-    <p>{{ event.required_skills }}</p>
-    <form method="POST" action="{{ url_for('view_event', event_id=event.id) }}">
-        {{ form.hidden_tag() }}
-        {{ form.event_id(value=event.id) }}
-        {{ form.submit(class="btn btn-primary") }}
-    </form>
-</div>
-{% endfor %}
+{% if events %}
+    {% for event in events %}
+    <div class="text-center border border-info table-info rounded" style="width: 50%; margin-left: 25%; margin-top: 20px; padding-bottom: 20px;">
+        <b>Event Name:</b>
+        <p>{{ event.name }}</p> 
+        <b>Event Description:</b>
+        <p>{{ event.description }}</p> 
+        <b>Event Location:</b>
+        <p>{{ event.city }}, {{ event.state_id }}, {{ event.zipcode }}</p> 
+        <b>Event Time:</b>
+        <p>{{ event.date.strftime('%Y-%m-%d') }}</p> 
+        <b>Urgency:</b>
+        <p>{{ event.urgency }}</p>
+        <b>Required Skills:</b>
+        <p>{{ event.skills }}</p> 
+        <form method="POST" action="{{ url_for('view_event', event_id=event.id) }}">
+            {{ form.hidden_tag() }}
+            {{ form.event_id(value=event.id) }}
+            {{ form.submit(class="btn btn-primary") }}
+        </form>
+    </div>
+    {% endfor %}
+{% else %}
+    <p class="text-center">No events available.</p>
+{% endif %}
 
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>

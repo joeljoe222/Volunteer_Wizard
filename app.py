@@ -11,6 +11,7 @@ app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
 
+from forms import NotificationForm, EventCreateForm, EventManageForm, RegisterForm, LoginForm, EventSelectionForm, VolunteerSelectionForm
 
 #Define association for skills - used for matching module possibly?
 event_skills = db.Table('event_skills',
@@ -296,13 +297,42 @@ def event_manage(event_id):
 #Admin and Volunteer Systems ===================================================
 
 #Admin page
-@app.route("/admin", methods=['GET', 'POST'])
+@app.route("/admin")
 def admin():
     form = EventSelectionForm()
+    events = Event.query.all()  # Fetching all events from the database
     if form.validate_on_submit():
         event_id = form.event_id.data
         return redirect(url_for('view_event', event_id=event_id))
     return render_template("adminEvents.html", events=events, form=form)
+
+@app.route("/admin")
+def admin_dashboard():
+    events = Event.query.all()
+    return render_template("adminEvents.html", events=events)
+
+@app.route("/admin/events")
+def admin_events():
+    events = Event.query.all()
+    return render_template("adminEvents.html", events=events)
+
+@app.route("/admin/event/<int:event_id>", methods=['GET', 'POST'])
+def admin_match(event_id):
+    event = Event.query.get_or_404(event_id)
+    volunteers = User.query.filter_by(role='volunteer').all()  # Fetch volunteers
+    form = VolunteerSelectionForm()
+
+    if form.validate_on_submit():
+        volunteer_id = form.volunteer_id.data
+        volunteer = User.query.get(volunteer_id)
+        if volunteer:
+            history = VolunteerHistory(volunteer_id=volunteer.id, event_id=event.id, status='Assigned')
+            db.session.add(history)
+            db.session.commit()
+            flash(f'Volunteer {volunteer.name} assigned to event {event.name}!', 'success')
+            return redirect(url_for('admin_match', event_id=event.id))
+
+    return render_template("adminMatching.html", event=event, volunteers=volunteers, form=form)
 
 #Missing Label
 @app.route("/admin/event/<int:event_id>", methods=['GET', 'POST'])
@@ -324,29 +354,60 @@ def view_event(event_id):
 @app.route("/volunteer", methods=['GET', 'POST'])
 def volunteer():
     form = EventSelectionForm()
-    volunteer = volunteers[0]  # Simulating fetching from DB
-    matches = match_volunteers_to_events(volunteers, events)
-    matched_events = [match[1] for match in matches if match[0] == volunteer]
-    success_message = None
+    volunteers = User.query.filter_by(role='volunteer').all()  # Fetching all volunteers with role 'volunteer'
+    
+    # Check if volunteers list is empty
+    if not volunteers:
+        flash("No volunteers found.", "warning")
+        return render_template("volunteerMatching.html", volunteer=None, events=[], form=form)
+
+    volunteer = volunteers[0]  # Simulating fetching the first volunteer
+    events = Event.query.all()  # Fetching all events
+    matched_events = []  # Replace with logic to get matched events if applicable
 
     if form.validate_on_submit():
         event_id = form.event_id.data
-        selected_event = next((event for event in events if event['id'] == event_id), None)
-        success_message = f'Successfully matched with event: {selected_event["event_name"]}'
+        selected_event = Event.query.get(event_id)
+        success_message = f'Successfully matched with event: {selected_event.name}'
+        return render_template("volunteerMatching.html", volunteer=volunteer, events=matched_events, form=form, success_message=success_message)
 
-    return render_template("volunteerMatching.html", volunteer=volunteer, events=matched_events, form=form, success_message=success_message)
+    return render_template("volunteerMatching.html", volunteer=volunteer, events=matched_events, form=form)
+
+#volunteer dashboard
+@app.route("/volunteer/<int:volunteer_id>")
+def volunteer_dashboard(volunteer_id):
+    volunteer = User.query.get_or_404(volunteer_id)
+    history = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
+    events = [h.event for h in history if h.event]  # List of events the volunteer is assigned to
+    return render_template("volunteerMatching.html", volunteer=volunteer, events=events)
 
 #Volunteer's history page
 @app.route("/history/<int:volunteer_id>")
 def history(volunteer_id):
-    volunteer = next((v for v in volunteers if v['id'] == volunteer_id), None)
-    volunteer_events = [event for event in events if event['volunteer_id'] == volunteer_id]
-    return render_template("history.html", volunteer=volunteer, events=volunteer_events)
+    volunteer = User.query.get_or_404(volunteer_id)
+    history = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
+    return render_template("history.html", volunteer=volunteer, history=history)
 
+
+@app.route('/history/add', methods=['GET', 'POST'])
+def add_history():
+    form = VolunteerHistoryForm()
+    if form.validate_on_submit():
+        history_record = VolunteerHistory(
+            volunteer_id=form.volunteer_id.data,
+            event_id=form.event_id.data,
+            participation_date=form.participation_date.data,
+            status=form.status.data
+        )
+        db.session.add(history_record)
+        db.session.commit()
+        flash('Volunteer history added successfully!', 'success')
+        return redirect(url_for('history', volunteer_id=form.volunteer_id.data))
+    return render_template('add_history.html', form=form)
 #End of pages ==================================================================
 
 
-#PLEASE LABEL THIS
+#match volunteers to events
 def match_volunteers_to_events(volunteers, events):
     matches = []
     for event in events:

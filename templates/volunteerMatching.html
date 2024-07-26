@@ -1,4 +1,4 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 {% block content %}
 
 <div class="container">
@@ -17,7 +17,7 @@
     <b>Name:</b>
     <p>{{ volunteer.name }}</p>
     <b>Skills:</b>
-    <p>{{ volunteer.skills }}</p>
+    <p>{{ volunteer.skills }}</p> <!-- Assuming skills is a string -->
 </div>  
 
 <div class="container">
@@ -37,27 +37,28 @@
 {% for event in events %}
 <div class="text-center border border-info table-info rounded" style="width: 50%; margin-left: 25%; margin-top: 20px; padding-bottom: 20px;">
     <b>Event Name:</b>
-    <p>{{ event.event_name }}</p>
+    <p>{{ event.name }}</p> <!-- Changed event_name to name -->
     <b>Event Description:</b>
-    <p>{{ event.event_description }}</p>
+    <p>{{ event.description }}</p> <!-- Changed event_description to description -->
     <b>Event Location:</b>
-    <p>{{ event.location }}</p>
+    <p>{{ event.city }}, {{ event.state_id }}, {{ event.zipcode }}</p> <!-- Combined location details -->
     <b>Event Time:</b>
-    <p>{{ event.event_time }}</p>
+    <p>{{ event.date.strftime('%Y-%m-%d') }}</p> <!-- Showing event date -->
     <b>Urgency:</b>
     <p>{{ event.urgency }}</p>
     <b>Required Skills:</b>
-    <p>{{ event.required_skills }}</p>
+    <p>{{ event.skills }}</p> <!-- Assuming skills is a string -->
     <form method="POST">
         {{ form.hidden_tag() }}
         {{ form.event_id(value=event.id) }}
         {{ form.submit(class="btn btn-primary") }}
     </form>
+    <a href="{{ url_for('view_history', volunteer_id=volunteer.id) }}">View Volunteer History</a>
 </div>
 {% endfor %}
 
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/js/bootstrap.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
 {% endblock %}

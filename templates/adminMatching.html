@@ -1,4 +1,4 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 {% block content %}
 
 <div class="container">
@@ -15,17 +15,17 @@
 
 <div class="text-center border border-info rounded" style="width: 50%; margin-left: 25%; margin-top: 20px; padding-bottom: 20px;">
     <b>Event Name:</b>
-    <p>{{ event.event_name }}</p>
+    <p>{{ event.name }}</p> <!-- Changed event_name to name -->
     <b>Event Description:</b>
-    <p>{{ event.event_description }}</p>
+    <p>{{ event.description }}</p> <!-- Changed event_description to description -->
     <b>Event Location:</b>
-    <p>{{ event.location }}</p>
+    <p>{{ event.city }}, {{ event.state_id }}, {{ event.zipcode }}</p> <!-- Combined location details -->
     <b>Event Time:</b>
-    <p>{{ event.event_time }}</p>
+    <p>{{ event.date.strftime('%Y-%m-%d') }}</p> <!-- Showing event date -->
     <b>Urgency:</b>
     <p>{{ event.urgency }}</p>
     <b>Required Skills:</b>
-    <p>{{ event.required_skills }}</p>
+    <p>{{ event.skills }}</p> <!-- Assuming skills is a string -->
 </div>
 
 <div class="container">
@@ -47,7 +47,7 @@
     <b>Name:</b>
     <p>{{ volunteer.name }}</p>
     <b>Skills:</b>
-    <p>{{ volunteer.skills }}</p>
+    <p>{{ volunteer.skills }}</p> <!-- Assuming skills is a string -->
     <form method="POST">
         {{ form.hidden_tag() }}
         {{ form.volunteer_id(value=volunteer.id) }}
