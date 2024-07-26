@@ -1,9 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
-from flask_wtf import FlaskForm
-from wtforms import HiddenField, SubmitField, StringField, PasswordField, EmailField, SelectField
-from wtforms.validators import DataRequired, Email, Length, ValidationError
-from flask_wtf.csrf import CSRFProtect
-from forms import NotificationForm, EventCreateForm, EventManageForm
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from forms import NotificationForm, EventCreateForm, EventManageForm, RegisterForm, LoginForm, EventSelectionForm, VolunteerSelectionForm
 from flask_sqlalchemy import SQLAlchemy 
 from datetime import datetime  
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,11 +8,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0b\xb9\xa5\xb6\xd7.\xc3'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
 
 
-# Define association tables for many-to-many relationships
+#Define association for skills - used for matching module possibly?
 event_skills = db.Table('event_skills',
     db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
     db.Column('skill_id', db.Integer, db.ForeignKey('skill.id'), primary_key=True)
@@ -27,9 +23,11 @@ user_skills = db.Table('user_skills',
     db.Column('skill_id', db.Integer, db.ForeignKey('skill.id'), primary_key=True)
 )
 
+#Database Models WIP : Migrate to new file if possible =========================
 
-#database model, still in progress
-'''User Profile Management (After registration, users should log in first to complete their profile). Following fields will be on the profile page/form:
+#User Model
+'''
+User Profile Management (After registration, users should log in first to complete their profile). Following fields will be on the profile page/form:
 Full Name (50 characters, required)
 Address 1 (100 characters, required)
 Address 2 (100 characters, optional)
@@ -54,19 +52,8 @@ class User(db.Model):
 
     def __repr__(self):
         return '<Name %r>' % self.id
-      
-# Form Class
-class RegisterForm(FlaskForm):
-    email = EmailField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    role = SelectField('Role', choices=[('1', 'Volunteer'), ('2', 'Administrator')], validators=[DataRequired()])
-    submit = SubmitField('Submit')
-
-class LoginForm(FlaskForm):
-    email = EmailField('Email', validators=[DataRequired(),Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    submit = SubmitField('Login')
-
+    
+#Event Model
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -81,16 +68,19 @@ class Event(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     notifications = db.relationship('Notification', backref='event', lazy=True)
 
+#Notification Model
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
 
+#Skill Model
 class Skill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
 
+#State Model
 class State(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(2), nullable=False, unique=True)
@@ -99,8 +89,23 @@ class State(db.Model):
     events = db.relationship('Event', backref='state', lazy=True)
 
 
+#All Pages =====================================================================
 
-#THIS SITE OUTPUTS CURRENT DATA IN DB: SKILL, EVENT, NOTIFICATION
+#Main index page
+#Add register button
+@app.route("/")
+def index():
+    form = LoginForm()
+    return render_template("index.html", form = form)
+
+#About page
+#Remake to have info on all teammates and who was in charge of what
+@app.route("/about") # flask url_for 
+def about():
+    return render_template("about.html")
+
+#Test Page : Outputs all Databases Data
+#Outputs: SKILL, EVENT, NOTIFICATION, USER
 @app.route("/test")
 def test_db_output():
     skills = Skill.query.all()
@@ -111,150 +116,9 @@ def test_db_output():
     return render_template("test.html", skills=skills, states=states, users=users, events=events, notifications=notifications)
 
 
-#HARDCODED DATA FOR ASSIGNMENT 3
-#Example Event
-event_data = {
-    1 : {
-        'event_name':'Example Event One',
-        'event_description':'Description for Event One',
-        #'event_date':datetime.date(2025, 1, 1),
-        'urgency':'1',
-        'event_address':'1111 Street Name',
-        'event_city':'USA',
-        'event_state':'TX',
-        'event_zipcode':'11111',
-        'required_skills':['a']
-    },
-    2 : {
-        'event_name':'Example Event Two',
-        'event_description':'Description for Event Two',
-        #'event_date':datetime.date(2025, 2, 2),
-        'urgency':'2',
-        'event_address':'2222 Street Name',
-        'event_city':'USA',
-        'event_state':'FL',
-        'event_zipcode':'22222',
-        'required_skills':['b','c']
-    }
-}
+#User Profile System -----------------------------------------------------------
 
-skill_data = {
-    'a':'Skill 1',
-    'b':'Skill 2',
-    'c':'Skill 3'
-}
-
-#Example Notification
-notification_data = {
-    1:{
-        1:{
-            'notification_name':'Notification ONE for Event ONE',
-            'notification_description':'Notification Description for Event ONE'
-        },
-        2:{
-            'notification_name':'Notification TWO for Event ONE',
-            'notification_description':'Notification Description for Event ONE'
-        }
-        
-    },
-    2:{
-        1:
-        {
-            'notification_name':'Notification ONE for Event TWO',
-            'notification_description':'Notification ONE Description for Event TWO'
-        },
-        2:
-        {
-            'notification_name':'Notification TWO for Event TWO',
-            'notification_description':'Notification TWO Description for Event TWO'
-        },
-        3:
-        {
-            'notification_name':'Notification THREE for Event TWO',
-            'notification_description':'Notification THREE Description for Event TWO'
-        }
-    }
-}
-
-
-
-# move to db
-states = [
-    {'code': 'AL', 'name': 'Alabama'},
-    {'code': 'AK', 'name': 'Alaska'},
-    {'code': 'AZ', 'name': 'Arizona'},
-    {'code': 'AR', 'name': 'Arkansas'},
-    {'code': 'CA', 'name': 'California'},
-    {'code': 'CO', 'name': 'Colorado'},
-]
-#sample until DB
-skills = [
-    'Planning and scheduling', 'Problem-solving', 'IT support', 'Photography', 'Workshop facilitation'
-]
-
-# Sample data
-volunteers = [
-    {
-        'id': 1,
-        'name': 'John Doe',
-        'skills': 'Communication, Time management, Leadership'
-    },
-    {
-        'id': 2,
-        'name': 'John Smith',
-        'skills': 'Communication, Time management'
-    }
-]
-
-events = [
-    {
-        'id': 1,
-        'event_name': 'Early Voting',
-        'event_description': 'Early voting for the upcoming elections',
-        'location': 'Houston, TX (77490)',
-        'event_time': '6:30 PM - 9:30 PM',
-        'urgency': 2,
-        'required_skills': 'Communication, Time management, Leadership',
-        'event_date': '2023-07-15',
-        'participation_status': 'Completed',
-        'volunteer_id': 1
-    },
-    {
-        'id': 2,
-        'event_name': 'Food Drive',
-        'event_description': 'Food drive for people in need',
-        'location': 'Houston, TX (73031)',
-        'event_time': '3:30 PM - 7:30 PM',
-        'urgency': 1,
-        'required_skills': 'Communication, Time management',
-        'event_date': '2023-07-16',
-        'participation_status': 'In Progress',
-        'volunteer_id': 1
-    },
-    {
-        'id': 3,
-        'event_name': 'Community Clean-up',
-        'event_description': 'Cleaning up the local community park',
-        'location': 'Houston, TX (77002)',
-        'event_time': '9:00 AM - 12:00 PM',
-        'urgency': 3,
-        'required_skills': 'Leadership, Teamwork',
-        'event_date': '2023-07-17',
-        'participation_status': 'In Progress',
-        'volunteer_id': 2
-    }
-]
-
-
-# need to remove these by adding it in the DB
-
-
-
-@app.route("/")
-def index():
-    form = LoginForm()
-    return render_template("index.html", form = form)
-
+#Login Page
 @app.route("/login", methods=['POST'])
 def login():
     form = LoginForm()
@@ -277,6 +141,7 @@ def login():
 def about():
     return render_template("about.html")
 
+#Register Page
 @app.route("/register", methods=['GET','POST'])
 def register():
     form = RegisterForm()
@@ -302,6 +167,8 @@ def register():
 
     return render_template("register.html", form=form)
 
+#Profile page
+#Use profile id rather than email for url
 @app.route("/profile/<email>", methods=['GET', 'POST'])
 def profile(email):
 
@@ -320,13 +187,15 @@ def profile(email):
     return render_template("profile.html", states=states, skills=skills, email=email)
 
 
-#NOTIFICATION SYSTEM -----------------------------------------------------------
+#Notification System -----------------------------------------------------------
+
+#Main notification page
 @app.route("/notification")
 def notification_main():
     notifications = Notification.query.all()
     return render_template("notification-main.html", notifications=notifications)
 
-
+#Create notification page
 @app.route("/notification/create", methods=['GET','POST'])
 def notification_create():
     form = NotificationForm()
@@ -346,18 +215,23 @@ def notification_create():
     return render_template('notification-create.html', form=form)
 
 
-#EVENT SYSTEM ------------------------------------------------------------------
+#Event System ------------------------------------------------------------------
+
+#Main event page
 @app.route("/event")
 def event_main():
     events = Event.query.all()
     return render_template("event-main.html", events=events)
 
+#Event page for specified event
 @app.route("/event/<int:event_id>")
 def event_view(event_id):
     event = Event.query.get_or_404(event_id)
     notifications = Notification.query.filter_by(event_id=event_id).all()
     return render_template("event-view.html", event=event, event_id=event_id, notifications=notifications)
 
+#Create event page
+#Make it accessible to admins only
 @app.route("/event/create", methods=['GET','POST'])
 def event_create():
     form = EventCreateForm()
@@ -386,6 +260,8 @@ def event_create():
         return redirect(url_for('event_create'))
     return render_template("event-create.html", form=form)
 
+#Event management page
+#Make it only accessible to Admins
 @app.route("/event/<int:event_id>/manage", methods=['GET','POST'])
 def event_manage(event_id):
     event = Event.query.get_or_404(event_id)
@@ -421,26 +297,9 @@ def event_manage(event_id):
 
 
 
+#Admin and Volunteer Systems ===================================================
 
-
-class EventSelectionForm(FlaskForm):
-    event_id = HiddenField('Event ID', validators=[DataRequired()])
-    submit = SubmitField('Select Event')
-
-class VolunteerSelectionForm(FlaskForm):
-    volunteer_id = HiddenField('Volunteer ID', validators=[DataRequired()])
-    submit = SubmitField('Select Volunteer')
-
-def match_volunteers_to_events(volunteers, events):
-    matches = []
-    for event in events:
-        required_skills = set(event['required_skills'].split(', '))
-        for volunteer in volunteers:
-            volunteer_skills = set(volunteer['skills'].split(', '))
-            if required_skills.issubset(volunteer_skills):
-                matches.append((volunteer, event))
-    return matches
-
+#Admin page
 @app.route("/admin", methods=['GET', 'POST'])
 def admin():
     form = EventSelectionForm()
@@ -449,6 +308,7 @@ def admin():
         return redirect(url_for('view_event', event_id=event_id))
     return render_template("adminEvents.html", events=events, form=form)
 
+#Missing Label
 @app.route("/admin/event/<int:event_id>", methods=['GET', 'POST'])
 def view_event(event_id):
     form = VolunteerSelectionForm()
@@ -464,6 +324,7 @@ def view_event(event_id):
 
     return render_template("adminMatching.html", event=selected_event, volunteers=matched_volunteers, form=form, success_message=success_message)
 
+#Volunteer Page
 @app.route("/volunteer", methods=['GET', 'POST'])
 def volunteer():
     form = EventSelectionForm()
@@ -479,13 +340,28 @@ def volunteer():
 
     return render_template("volunteerMatching.html", volunteer=volunteer, events=matched_events, form=form, success_message=success_message)
 
-
+#Volunteer's history page
 @app.route("/history/<int:volunteer_id>")
 def history(volunteer_id):
     volunteer = next((v for v in volunteers if v['id'] == volunteer_id), None)
     volunteer_events = [event for event in events if event['volunteer_id'] == volunteer_id]
     return render_template("history.html", volunteer=volunteer, events=volunteer_events)
 
+#End of pages ==================================================================
+
+
+#PLEASE LABEL THIS
+def match_volunteers_to_events(volunteers, events):
+    matches = []
+    for event in events:
+        required_skills = set(event['required_skills'].split(', '))
+        for volunteer in volunteers:
+            volunteer_skills = set(volunteer['skills'].split(', '))
+            if required_skills.issubset(volunteer_skills):
+                matches.append((volunteer, event))
+    return matches
+
+#Place holder for Pricing Module
 class PricingModule:
     def __init__(self):
         self.prices = {}
@@ -496,7 +372,12 @@ class PricingModule:
     def get_price(self, item):
         return self.prices.get(item, None)
 
+
+#Runs server locally ===========================================================
+#Debug=True allows site to update as it detects changes in these files
+#Updating py files will crash server
+#Updating html files will show changes on page refresh 
 if __name__ == '__main__': 
     with app.app_context():
         db.create_all()
-    app.run(host='0.0.0.0', debug=True) # starts server
+    app.run(host='0.0.0.0', debug=True)
