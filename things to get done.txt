@@ -1,7 +1,0 @@
-Joels things to get done
-1. Create database
-2. store login details in DB
-3. store profile info in DB
-4. Access DB for authentication
-5. Manage Access volunteer vs ADMIN
-
