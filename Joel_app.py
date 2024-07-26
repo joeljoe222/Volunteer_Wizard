@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from forms import NotificationForm, EventCreateForm, EventManageForm, RegisterForm, LoginForm, EventSelectionForm, VolunteerSelectionForm
 from flask_sqlalchemy import SQLAlchemy 
-from datetime import datetime
+from datetime import datetime  
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 
 app = Flask(__name__)
@@ -39,13 +41,13 @@ Availability (Date picker, multiple dates allowed, required)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
-    password = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(50), nullable=False)
     address = db.Column(db.String(200), nullable=False)
     state_id = db.Column(db.Integer, db.ForeignKey('state.id'), nullable=False)
     skills = db.relationship('Skill', secondary=user_skills, backref=db.backref('users', lazy='dynamic'))
-    #preferencess = db.Column(db.String(200))
+    preferences = db.Column(db.String(200), nullable=False)
     availability = db.Column(db.String(200))
 
     def __repr__(self):
@@ -122,10 +124,10 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         email = form.email.data
-        password = form.password.data
-        user = User.query.filter_by(email=email, password=password).first()
+        password = form.password.data # password recived from form/html.file
+        user = User.query.filter_by(email=email).first()
         
-        if user:
+        if user and check_password_hash(user.password, password): #check_password_hash(pwhash, password)
             session['email'] = email
             flash(f"Welcome back, {user.name}!", "success")
             return redirect(url_for('profile', email=email))
@@ -134,19 +136,27 @@ def login():
     
     return render_template("index.html", form=form)
 
+
+@app.route("/about") # flask url_for 
+def about():
+    return render_template("about.html")
+
 #Register Page
 @app.route("/register", methods=['GET','POST'])
 def register():
     form = RegisterForm()
     if form.validate_on_submit(): #validating
+        hashed_password = generate_password_hash(form.password.data ) #method='sha256'
+
         
         new_user = User(
             name='',
             email=form.email.data,
-            password=form.password.data,  
+            password=hashed_password,  
             role=form.role.data,
             address='',
             skills='',
+            preferences='',
             availability=''
         )
         db.session.add(new_user)
@@ -166,8 +176,9 @@ def profile(email):
     if request.method == 'POST':
         user = User.query.filter_by(email=email).first()
         user.name = request.form['full_name']
-        user.address = request.form['address1'] + ' ' + request.form['address2']
-        user.skills = request.form['skills']
+        user.address = request.form['address1'] + ' ' + request.form['address2']+ ', ' + request.form['city']+ ', ' + request.form['state']+', ' + request.form['zip_code']
+        user.skills = ', '.join(request.form.getlist('skills[]'))
+        user.preferences = request.form['preferences']
         user.availability = ', '.join(request.form.getlist('availability[]'))
         db.session.commit()
         flash("Profile updated successfully.", "success")
