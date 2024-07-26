@@ -9,15 +9,15 @@
 
 				<div class="row g-2">
 					<div class="row-sm-6">
-						{{ form.notification_name.label(class='form-control-label') }}
-						{{ form.notification_name(class='form-control', placeholder='Notification Title') }}
-						{% for error in form.notification_name.errors %}
+						{{ form.name.label(class='form-control-label') }}
+						{{ form.name(class='form-control', placeholder='Notification Title') }}
+						{% for error in form.name.errors %}
 							<div class="text-danger">{{ error }}</div>
 						{% endfor %}
 					<div class="row-sm-6">
-						{{ form.notification_description.label(class='form-control-label') }}
-						{{ form.notification_description(class='form-control', placeholder='Notification Details') }}
-						{% for error in form.notification_description.errors %}
+						{{ form.description.label(class='form-control-label') }}
+						{{ form.description(class='form-control', placeholder='Notification Details') }}
+						{% for error in form.description.errors %}
 							<div class="text-danger">{{ error }}</div>
 						{% endfor %}
 					</div>

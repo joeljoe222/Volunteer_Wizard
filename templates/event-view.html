@@ -5,29 +5,20 @@
 		<div class="col-md-9 col-sm-10 mx-auto">
 			<div class="row-md-5 p-3 bg-primary bg-opacity-25 border border-info rounded">
 				<div>
-					<!--Links to manage event and create notification-->
-					<!--Make links redirect to respective manage page and create notif page for each event-->
-
-					<!--
-					<a class="nav-link d-inline" href="{{url_for('event_manage', event_id=1)}}">[Manage Event]</a>
-					<a class="nav-link d-inline" href="{{url_for('notification_create')}}">[Make a Notification]</a>
-					-->
-					
-
-					<h1 class="col">{{event['event_name']}}</h1>
+					<h1 class="col">{{event.name}}</h1>
 					<div class="col py-1 px-2 bg-light rounded">
 						<ul>
-							<li>Name: {{ event['event_name'] }}</li>
-							<li>Description: {{ event['event_description'] }}</li>
-							<li>Date: {{ event['event_date'] }}</li>
-							<li>Urgency: {{ event['urgency'] }}</li>
-							<li>Address: {{ event['event_address'] }}</li>
-							<li>Country: {{ event['event_country'] }}</li>
-							<li>State: {{ event['event_state'] }}</li>
-							<li>Zipcode: {{ event['event_zipcode'] }}</li>
+							<li>Name: {{ event.name }}</li>
+							<li>Description: {{ event.description }}</li>
+							<li>Date: {{ event.date }}</li>
+							<li>Urgency: {{ event.urgency }}</li>
+							<li>Address: {{ event.address }}</li>
+							<li>City: {{ event.city }}</li>
+							<li>State: {{ event.state.name }}</li>
+							<li>Zipcode: {{ event.zipcode }}</li>
 							<li>Required Skills: 
-								{% for skill_id in event['required_skills'] %}
-									{{ skill_data[skill_id] }} {% if not loop.last %}, {% endif %}
+								{% for skill in event.skills %}
+									{{ skill.name }} {% if not loop.last %}, {% endif %}
 								{% endfor %}
 							</li>
 						</ul>
@@ -35,10 +26,10 @@
 
 					<h1 class="'col">Notifications</h1>
 					<ul class="list-group">
-						{% for notification_id, notification in notification.items() %}
+						{% for notification in notifications %}
 							<li class="list-group-item">
-								<h5>{{ notification['notification_name'] }}</h5>
-								<p>{{ notification['notification_description'] }}</p>
+								<h5>{{ notification.name }}</h5>
+								<p>{{ notification.description }}</p>
 							</li>
 						{% endfor %}
 					</ul>
