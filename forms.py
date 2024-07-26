@@ -33,33 +33,33 @@ state = [
 #Naming SubjectAction()
 
 class NotificationForm(FlaskForm):
-    notification_name = StringField('Title', validators=[DataRequired(), Length(min=2, max=100)])
-    notification_description = TextAreaField('Notification', validators=[DataRequired(), Length(max=300)])
+    name = StringField('Title', validators=[DataRequired(), Length(min=2, max=100)])
+    description = TextAreaField('Notification', validators=[DataRequired(), Length(max=300)])
     submit = SubmitField('Push Notification')
 
-
+#make max fit with databses, zipcode requirements can be found in ass.2, make urgency database mayb?
 class EventCreateForm(FlaskForm):
-    event_name = StringField('Name of Event', validators=[DataRequired(), Length(min=2, max=100)])
-    event_description = TextAreaField('Event Description', validators=[DataRequired()])
-    event_date = DateField('Event Date', validators=[DataRequired()])
+    name = StringField('Name of Event', validators=[DataRequired(), Length(min=2, max=100)])
+    description = TextAreaField('Event Description', validators=[DataRequired()])
+    date = DateField('Event Date', validators=[DataRequired()])
     urgency = SelectField('Urgency', validators=[DataRequired()], choices=urgencyLevel)
-    event_address = StringField('Address', validators=[DataRequired()])
-    event_country = SelectField('Country', validators=[DataRequired()], choices=country)
-    event_state = SelectField('State', validators=[DataRequired()], choices=state)
-    event_zipcode = StringField('Zipcode', validators=[DataRequired(), Length(min=5, max=10)])
-    required_skills = SelectMultipleField('Required Skills', validators=[DataRequired()], choices=skills)
-    submit = SubmitField('Upload Event')
+    address = StringField('Address', validators=[DataRequired()])
+    city = StringField('City', validators=[DataRequired()])
+    state = SelectField('State', coerce=int, validators=[DataRequired()])
+    zipcode = StringField('Zipcode', validators=[DataRequired(), Length(min=5, max=10)])
+    skills = SelectMultipleField('Required Skills', coerce=int, validators=[DataRequired()])
+    submit = SubmitField('Create Event')
 
 
 class EventManageForm(FlaskForm):
-    event_name = StringField('Name of Event', validators=[DataRequired(), Length(min=2, max=100)])
-    event_description = TextAreaField('Event Description', validators=[DataRequired()])
-    event_date = DateField('Event Date', validators=[DataRequired()])
+    name = StringField('Name of Event', validators=[DataRequired(), Length(min=2, max=100)])
+    description = TextAreaField('Event Description', validators=[DataRequired()])
+    date = DateField('Event Date', validators=[DataRequired()])
     urgency = SelectField('Urgency', validators=[DataRequired()], choices=urgencyLevel)
-    event_address = StringField('Address', validators=[DataRequired()])
-    event_country = SelectField('Country', validators=[DataRequired()], choices=country)
-    event_state = SelectField('State', validators=[DataRequired()], choices=state)
-    event_zipcode = StringField('Zipcode', validators=[DataRequired(), Length(min=5, max=10)])
-    required_skills = SelectMultipleField('Required Skills', validators=[DataRequired()], choices=skills)
+    address = StringField('Address', validators=[DataRequired()])
+    city = StringField('City', validators=[DataRequired()])
+    state = SelectField('State', validators=[DataRequired()], choices=state)
+    zipcode = StringField('Zipcode', validators=[DataRequired(), Length(min=5, max=10)])
+    skills = SelectMultipleField('Required Skills', validators=[DataRequired()], choices=skills)
     submit = SubmitField('Update Event')
 

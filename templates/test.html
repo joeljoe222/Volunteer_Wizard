@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skills</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Skills</h1>
+        <ul class="list-group">
+            {% for skill in skills %}
+                <li class="list-group-item">{{ skill.name }}</li>
+            {% endfor %}
+        </ul>
+        <h1>Users</h1>
+        <ul class="list-group">
+            {% for user in users %}
+                <li class="list-group-item">
+                    <h4>{{ user.name }}</h4>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Role:</strong> {{ user.role }}</p>
+                    <p><strong>Address:</strong> {{ user.address }}</p>
+                    <p><strong>City:</strong> </p>
+                    <p><strong>State:</strong> {{ user.state.name }}</p>
+                    <p><strong>Skills:</strong> 
+                        {% for skill in user.skills %}
+                            {{ skill.name }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                    <p><strong>Preferences:</strong> {{ user.preferences }}</p>
+                    <p><strong>Availability:</strong> {{ user.availability }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+		<h1>Events</h1>
+        <ul class="list-group">
+            {% for event in events %}
+                <li class="list-group-item">
+                    <h4><strong>{{ event.name }}</strong></h4>
+                    <p>{{ event.description }}</p>
+                    <p><strong>Date:</strong> {{ event.date }}</p>
+                    <p><strong>Urgency:</strong> {{ event.urgency }}</p>
+                    <p><strong>Address:</strong> {{ event.address }}</p>
+                    <p><strong>City:</strong> {{ event.city }}</p>
+                    <p><strong>State:</strong> {{ event.state.name }}</p>
+                    <p><strong>Zipcode:</strong> {{ event.zipcode }}</p>
+                    <p><strong>Skills:</strong>
+                        {% for skill in event.skills %}
+                            {{ skill.name }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                </li>
+            {% endfor %}
+        </ul>
+		<h1>Notifications</h1>
+        <ul class="list-group">
+            {% for notification in notifications %}
+                <li class="list-group-item">
+                    <h4>{{ notification.name }}</h4>
+                    <p>{{ notification.description }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
