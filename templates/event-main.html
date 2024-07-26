@@ -8,24 +8,23 @@
 					<div>
 						<h1 class="mb-4">List of Events</h1>
 						<ul class="list-group">
-							{% for event_id, event in event_data.items() %}
+							{% for event in events %}
 								<li class="list-group-item">
-									<h5>{{ event['event_name'] }}</h5>
-									<p>{{ event['event_description'] }}</p>
+									<h4><a href="{{ url_for('event_view', event_id=event.id) }}">{{ event.name }}</a></h4>
+									<p>{{ event.description }}</p>
 
-									<p><strong>Date:</strong> {{ event['event_date'].strftime('%Y-%m-%d') }}</p>
-									<p><strong>Urgency:</strong> {{ event['urgency'] }}</p>
-									<p><strong>Address:</strong> {{ event['event_address'] }}</p>
-									<p><strong>Country:</strong> {{ event['event_country'] }}</p>
-									<p><strong>State:</strong> {{ event['event_state'] }}</p>
-									<p><strong>Zipcode:</strong> {{ event['event_zipcode'] }}</p>
+									<p><strong>Date:</strong> {{ event.date }}</p>
+									<p><strong>Urgency:</strong> {{ event.urgency }}</p>
+									<p><strong>Address:</strong> {{ event.address }}</p>
+									<p><strong>Country:</strong> {{ event.city }}</p>
+									<p><strong>State:</strong> {{ event.state.name }}</p>
+									<p><strong>Zipcode:</strong> {{ event.zipcode }}</p>
 
 									<p><strong>Required Skills:</strong> 
-										{% for skill_id in event['required_skills'] %}
-                            				{{ skill_data[skill_id] }} {% if not loop.last %}, {% endif %}
+										{% for skill in event.skills %}
+                            				{{ skill.name }} {% if not loop.last %}, {% endif %}
                         				{% endfor %}
 									</p>
-									<a href="{{ url_for('event_view', event_id=event_id) }}" class="btn btn-primary">View Event</a>
 
 									
 								</li>
