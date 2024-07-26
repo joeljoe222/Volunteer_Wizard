@@ -1,4 +1,15 @@
-Everyone
+================================================================================
+	Files : Descriptions
+
+DB_AddSample	: Adds Sample data to already exisitng databases || Use to add and test more data
+DB_ClearAll		: Clears All Databases || Clear Databases if there are issues with DBs
+DB_ClearAll_AddSample	: Reinitializes Databases with Sample Databases || Good practice is to run this before Debugging
+================================================================================
+
+
+================================================================================
+	Everyone : Good Practices while working
+
 -Double check requirements from previous assignments and make sure you still meet them
 -Clarify and cleaning up code : This is a suggestion just to clean up our code and maintain readability, these are based of suggestions for each language
 	+Do not abbreviate variables
@@ -11,19 +22,22 @@ Everyone
 	HTML:
        	change URLs to use dashes event-main, event-create
 -Remove all hardcoded data once databases are fully set up
+================================================================================
 
 
-
+================================================================================
 Joels things to get done
 1. Create database
 2. store login details in DB
 3. store profile info in DB
 4. Access DB for authentication
 5. Manage Access volunteer vs ADMIN
+================================================================================
 
 
+================================================================================
+	Jay : Event, Notification
 
-Jay
 -Create database
 	+Event
 	+Notification
@@ -43,3 +57,5 @@ Jay
 -Make event skills show up in manage forms
 -Make sure all forms validate
 -Add manage notification page
+-Update Nav Bar with only links that dont need any id
+================================================================================

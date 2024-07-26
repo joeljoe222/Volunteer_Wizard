@@ -65,12 +65,11 @@ states = {
 
 
 with app.app_context():
-    # Drop all tables
     db.drop_all()
-    # Recreate all tables
     db.create_all()
-    print("Database cleared and recreated.")
+    print("All Database cleared and recreated.")
 
+    #Populate Skill Database
     skill_objs = []
     for skill_name in skills:
         existing_skill = Skill.query.filter_by(name=skill_name).first()
@@ -80,6 +79,7 @@ with app.app_context():
             skill_objs.append(new_skill)
     db.session.commit()
     
+    #Populate State Database
     state_objs = []
     for state_code, state_name in states.items():
         existing_state = State.query.filter_by(code=state_code).first()
@@ -89,16 +89,40 @@ with app.app_context():
             state_objs.append(new_state)
     db.session.commit()
 
-    print('Skill DB and State DB initialized')
+    print('Skill Database and State Database initialized')
 
 
-    # Create a sample user
-    user = User(name='Sample', email='sample@example.com', password='password', role='1', address='address', state_id=state_objs[1].id, preferencess='preference', availability='avalability')
-    user.skills.extend(skill_objs[:3])
-    db.session.add(user)
+    #Create a sample users
+    #prefrences is commented out in the model add later if missing argument
+    #Admin Sample
+    user_admin = User(name='Admin', email='Admin@example.com', password='password', role='2', address='address', state_id=state_objs[1].id, availability='avalability')
+    user_admin.skills.extend(skill_objs[:3])
+
+    db.session.add(user_admin)
     db.session.commit()
+    print('=============================')
+    print('Sample Admin User Created')
+    print('=============================')
+    print(f'Name: {user_admin.name}')
+    print(f'Email: {user_admin.email}')
+    print(f'Password: {user_admin.password}')
+    
+    #Volunteer Sample
+    user_volunteer = User(name='Volunteer', email='Volunteer@example.com', password='password', role='1', address='address', state_id=state_objs[2].id, availability='avalability')
+    user_volunteer.skills.extend(skill_objs[:3])
 
-    # Create sample events
+    db.session.add(user_volunteer)
+    db.session.commit()
+    print('=============================')
+    print('Sample Volunteer User Created')
+    print('=============================')
+    print(f'Name: {user_volunteer.name}')
+    print(f'Email: {user_volunteer.email}')
+    print(f'Password: {user_volunteer.password}')
+    print('=============================')
+
+
+    #Create sample events
     events = [
         {
             'name': 'Event One',
@@ -109,7 +133,7 @@ with app.app_context():
             'city': 'city',
             'state': state_objs[1],
             'zipcode': '11111',
-            'user_id': user.id
+            'user_id': user_admin.id
         },
         {
             'name': 'Event Two',
@@ -120,7 +144,7 @@ with app.app_context():
             'city': 'city222',
             'state': state_objs[15],
             'zipcode': '22222',
-            'user_id': user.id
+            'user_id': user_admin.id
         }
     ]
 
@@ -130,7 +154,9 @@ with app.app_context():
         db.session.add(event)
     db.session.commit()
 
-    # Create sample notifications for each event
+    print('Sample Events Created')
+
+    #Create sample notifications for each event
     event_one = Event.query.filter_by(name='Event One').first()
     event_two = Event.query.filter_by(name='Event Two').first()
 
@@ -167,4 +193,5 @@ with app.app_context():
         db.session.add(notification)
     db.session.commit()
 
-    print("Sample data inserted.")
+    print('Sample Notifications Created')
+    print('Succesfully Cleared Databases and Added Sample Data')
