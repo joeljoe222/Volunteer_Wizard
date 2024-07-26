@@ -23,6 +23,7 @@ class LoginForm(FlaskForm):
 #===============================================================================
 #Notification Create Form
 class NotificationForm(FlaskForm):
+    event_id = HiddenField('Event ID', validators=[DataRequired()])
     name = StringField('Title', validators=[DataRequired(), Length(min=2, max=100)])
     description = TextAreaField('Notification', validators=[DataRequired(), Length(max=300)])
     submit = SubmitField('Push Notification')

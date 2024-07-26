@@ -137,10 +137,6 @@ def login():
     return render_template("index.html", form=form)
 
 
-@app.route("/about") # flask url_for 
-def about():
-    return render_template("about.html")
-
 #Register Page
 @app.route("/register", methods=['GET','POST'])
 def register():
