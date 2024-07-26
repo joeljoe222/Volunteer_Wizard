@@ -259,7 +259,7 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-        user = Users.query.filter_by(email=email, password=password).first()
+        user = User.query.filter_by(email=email, password=password).first()
         
         if user:
             session['email'] = email
@@ -279,7 +279,7 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit(): #validating
         
-        new_user = Users(
+        new_user = User(
             name='',
             email=form.email.data,
             password=form.password.data,  
@@ -301,7 +301,7 @@ def profile(email):
 
     # captures data entered from profile.html
     if request.method == 'POST':
-        user = Users.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email).first()
         user.name = request.form['full_name']
         user.address = request.form['address1'] + ' ' + request.form['address2']
         user.skills = request.form['skills']
