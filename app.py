@@ -47,14 +47,24 @@ class User(db.Model):
     address = db.Column(db.String(200), nullable=False)
     state_id = db.Column(db.Integer, db.ForeignKey('state.id'), nullable=False)
     skills = db.relationship('Skill', secondary=user_skills, backref=db.backref('users', lazy='dynamic'))
-    preferencess = db.Column(db.String(200))
-    availability = db.Column(db.String(500), nullable=False)
+    #preferencess = db.Column(db.String(200))
+    availability = db.Column(db.String(200))
 
     def __repr__(self):
         return '<Name %r>' % self.id
+      
+# Form Class
+class RegisterForm(FlaskForm):
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    role = SelectField('Role', choices=[('1', 'Volunteer'), ('2', 'Administrator')], validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
-#DATABASE MODEL WIP - J
-#add city to all respective event pages then after that remove comment
+class LoginForm(FlaskForm):
+    email = EmailField('Email', validators=[DataRequired(),Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    submit = SubmitField('Login')
+
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -75,7 +85,6 @@ class Notification(db.Model):
     description = db.Column(db.String(200), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
 
-#Defined database
 class Skill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
@@ -167,20 +176,7 @@ notification_data = {
 
 
 
-# Form Class
-class RegisterForm(FlaskForm):
-    email = EmailField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    role = SelectField('Role', choices=[('1', 'Volunteer'), ('2', 'Administrator')], validators=[DataRequired()])
-    submit = SubmitField('Submit')
-
-class LoginForm(FlaskForm):
-    email = EmailField('Email', validators=[DataRequired(),Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    submit = SubmitField('Login')
-
-
-# add more in DB when pulling data from there
+# move to db
 states = [
     {'code': 'AL', 'name': 'Alabama'},
     {'code': 'AK', 'name': 'Alaska'},
@@ -247,10 +243,10 @@ events = [
     }
 ]
 
-#All pages involved in Application
 
-users = {}
-profiles = {}
+# need to remove these by adding it in the DB
+
+
 
 @app.route("/")
 def index():
@@ -263,12 +259,12 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-        user = users.get(email)
+        user = Users.query.filter_by(email=email, password=password).first()
         
-        if user and user['password'] == password:
+        if user:
             session['email'] = email
-            flash(f"Welcome back, {profiles[email]['full_name']}!", "success")
-            return redirect(url_for('profile',email=email))
+            flash(f"Welcome back, {user.name}!", "success")
+            return redirect(url_for('profile', email=email))
         else:
             flash("Invalid email or password.", "danger")
     
@@ -282,44 +278,38 @@ def about():
 def register():
     form = RegisterForm()
     if form.validate_on_submit(): #validating
-        email = form.email.data
-        password = form.password.data
-        role = form.role.data
         
-        users[email] = {'password': password, 'role': role} # storing
-        return redirect(url_for('profile',email=email))
+        new_user = Users(
+            name='',
+            email=form.email.data,
+            password=form.password.data,  
+            role=form.role.data,
+            address='',
+            skills='',
+            availability=''
+        )
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash("User added, please finish setting up")
+        return redirect(url_for('profile',email=form.email.data))
 
     return render_template("register.html", form=form)
 
 @app.route("/profile/<email>", methods=['GET', 'POST'])
 def profile(email):
+
     # captures data entered from profile.html
     if request.method == 'POST':
-
-        full_name = request.form['full_name']
-        address1 = request.form['address1']
-        address2 = request.form['address2']
-        city = request.form['city']
-        state = request.form['state']
-        zip_code = request.form['zip_code']
-        skills_selected = request.form.getlist('skills')
-        preferences = request.form['preferences']
-        availability_dates = request.form.getlist('availability[]')
-
-        # save to database add later
-        profiles[email] = {
-            'full_name': full_name,
-            'address1': address1,
-            'address2': address2,
-            'city': city,
-            'state': state,
-            'zip_code': zip_code,
-            'skills': skills_selected,
-            'preferences': preferences,
-            'availability': availability_dates
-        }
-
-        return redirect(url_for('index')) # place holder
+        user = Users.query.filter_by(email=email).first()
+        user.name = request.form['full_name']
+        user.address = request.form['address1'] + ' ' + request.form['address2']
+        user.skills = request.form['skills']
+        user.availability = ', '.join(request.form.getlist('availability[]'))
+        db.session.commit()
+        flash("Profile updated successfully.", "success")
+        return redirect(url_for('index'))
+   
     return render_template("profile.html", states=states, skills=skills, email=email)
 
 
