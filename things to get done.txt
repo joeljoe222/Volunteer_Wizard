@@ -1,7 +1,7 @@
 Joels things to get done
 1. Create database : done
 2. store login details in DB : done
-3. store profile info in DB : need to fix skills, preferences, availability, full adress, 2nd address line
-4. Access DB for authentication : this works, should i used LOGIN funcitonality from flask?
-5. Manage Access volunteer vs ADMIN
+3. store profile info in DB : done
+4. Access DB for authentication : this works manually, should i used LOGIN funcitonality from flask?
+5. Password hashing : done
 

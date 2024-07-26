@@ -5,8 +5,10 @@ from wtforms.validators import DataRequired, Email, Length, ValidationError
 from flask_wtf.csrf import CSRFProtect
 from forms import NotificationForm, EventCreateForm, EventManageForm
 from flask_sqlalchemy import SQLAlchemy 
-from datetime import datetime  # Import the datetime class
-# >>>>>>> main
+from datetime import datetime  
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0b\xb9\xa5\xb6\xd7.\xc3'
@@ -17,13 +19,13 @@ db = SQLAlchemy(app)
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
-    password = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(50), nullable=False)
     address = db.Column(db.String(200), nullable=False)
-    skills = db.Column(db.String(200))  # Use Text for storing JSON data
-    availability = db.Column(db.String(200))
-    #preferences = db.Column(db.String(200))
+    skills = db.Column(db.String(500), nullable=False)
+    availability = db.Column(db.String(200), nullable=False)
+    preferences = db.Column(db.String(200))
 
 
     def __repr__(self):
@@ -209,10 +211,10 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         email = form.email.data
-        password = form.password.data
-        user = Users.query.filter_by(email=email, password=password).first()
+        password = form.password.data # password recived from form/html.file
+        user = Users.query.filter_by(email=email).first()
         
-        if user:
+        if user and check_password_hash(user.password, password): #check_password_hash(pwhash, password)
             session['email'] = email
             flash(f"Welcome back, {user.name}!", "success")
             return redirect(url_for('profile', email=email))
@@ -220,7 +222,7 @@ def login():
             flash("Invalid email or password.", "danger")
     
     return render_template("index.html", form=form)
-#>>>>>>> main
+
 
 @app.route("/about") # flask url_for 
 def about():
@@ -230,14 +232,17 @@ def about():
 def register():
     form = RegisterForm()
     if form.validate_on_submit(): #validating
+        hashed_password = generate_password_hash(form.password.data ) #method='sha256'
+
         
         new_user = Users(
             name='',
             email=form.email.data,
-            password=form.password.data,  
+            password=hashed_password,  
             role=form.role.data,
             address='',
             skills='',
+            preferences='',
             availability=''
         )
         db.session.add(new_user)
@@ -255,8 +260,9 @@ def profile(email):
     if request.method == 'POST':
         user = Users.query.filter_by(email=email).first()
         user.name = request.form['full_name']
-        user.address = request.form['address1'] + ' ' + request.form['address2']
-        user.skills = request.form['skills']
+        user.address = request.form['address1'] + ' ' + request.form['address2']+ ', ' + request.form['city']+ ', ' + request.form['state']+', ' + request.form['zip_code']
+        user.skills = ', '.join(request.form.getlist('skills[]'))
+        user.preferences = request.form['preferences']
         user.availability = ', '.join(request.form.getlist('availability[]'))
         db.session.commit()
         flash("Profile updated successfully.", "success")
