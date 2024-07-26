@@ -1,241 +1,305 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_wtf import FlaskForm
-from wtforms import HiddenField, SubmitField
-from wtforms.validators import DataRequired
-from flask_wtf.csrf import CSRFProtect
-from forms import NotificationForm, EventCreateForm, EventManageForm
-import datetime
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from forms import NotificationForm, EventCreateForm, EventManageForm, RegisterForm, LoginForm, EventSelectionForm, VolunteerSelectionForm
+from flask_sqlalchemy import SQLAlchemy 
+from datetime import datetime  
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0b\xb9\xa5\xb6\xd7.\xc3'
-csrf = CSRFProtect(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+db = SQLAlchemy(app)
 
 
+#Define association for skills - used for matching module possibly?
+event_skills = db.Table('event_skills',
+    db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
+    db.Column('skill_id', db.Integer, db.ForeignKey('skill.id'), primary_key=True)
+)
 
-#TODO LIST for Jay Mejia :
-#make event seen from events page and update as edits are made
-#do the same with notification page
-#change all varibles and functions to snake_case
-#change html urls to be event-page
-#comment all work
+user_skills = db.Table('user_skills',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('skill_id', db.Integer, db.ForeignKey('skill.id'), primary_key=True)
+)
 
-#Example Event
-event_data = {
-    'eventName':'Example Event',
-    'eventDesc':'Here is where an Admin would write a description for the Event',
-    'eventDate':datetime.date(2024, 7, 24),
-    'urgency':'1',
-    'eventAddress':'404 Street Name',
-    'country':'USA',
-    'state':'TX',
-    'zipcode':'11220',
-    'requiredSkills':['a','c']
-}
+#Database Models WIP : Migrate to new file if possible =========================
 
-#Example Notification
-notification_data = {
-    'notifName':'Notification Title',
-    'notifDesc':'This is where the main notification information will be'
-}
+#User Model
+'''
+User Profile Management (After registration, users should log in first to complete their profile). Following fields will be on the profile page/form:
+Full Name (50 characters, required)
+Address 1 (100 characters, required)
+Address 2 (100 characters, optional)
+City (100 characters, required)
+State (Drop Down, selection required) DB will store 2-character state code
+Zip code (9 characters, at least 5-character code required)
+Skills (multi-select dropdown, required)
+Preferences (Text area, optional)
+Availability (Date picker, multiple dates allowed, required)
+'''
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    role = db.Column(db.String(50), nullable=False)
+    address = db.Column(db.String(200), nullable=False)
+    state_id = db.Column(db.Integer, db.ForeignKey('state.id'), nullable=False)
+    skills = db.relationship('Skill', secondary=user_skills, backref=db.backref('users', lazy='dynamic'))
+    preferences = db.Column(db.String(200), nullable=False)
+    availability = db.Column(db.String(200))
 
-
-# just sample until DB
-states = [
-    {'code': 'AL', 'name': 'Alabama'},
-    {'code': 'AK', 'name': 'Alaska'},
+    def __repr__(self):
+        return '<Name %r>' % self.id
     
-]
-#sample until DB
-skills = [
-    'Skill 1', 'Skill 2', 'Skill 3', 'Skill 4', 'Skill 5'
-]
+#Event Model
+class Event(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(200), nullable=False)
+    date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
+    urgency = db.Column(db.String(10), nullable=False)
+    address = db.Column(db.String(100), nullable=False)
+    city = db.Column(db.String(50), nullable=False)
+    state_id = db.Column(db.Integer, db.ForeignKey('state.id'), nullable=False)
+    zipcode = db.Column(db.String(10), nullable=False)
+    skills = db.relationship('Skill', secondary=event_skills, backref=db.backref('events', lazy='dynamic'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    notifications = db.relationship('Notification', backref='event', lazy=True)
 
-# Sample data
-volunteers = [
-    {
-        'id': 1,
-        'name': 'John Doe',
-        'skills': 'Communication, Time management, Leadership'
-    },
-    {
-        'id': 2,
-        'name': 'John Smith',
-        'skills': 'Communication, Time management'
-    }
-]
+#Notification Model
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(200), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
 
-events = [
-    {
-        'id': 1,
-        'event_name': 'Early Voting',
-        'event_description': 'Early voting for the upcoming elections',
-        'location': 'Houston, TX (77490)',
-        'event_time': '6:30 PM - 9:30 PM',
-        'urgency': 2,
-        'required_skills': 'Communication, Time management, Leadership',
-        'event_date': '2023-07-15',
-        'participation_status': 'Completed',
-        'volunteer_id': 1
-    },
-    {
-        'id': 2,
-        'event_name': 'Food Drive',
-        'event_description': 'Food drive for people in need',
-        'location': 'Houston, TX (73031)',
-        'event_time': '3:30 PM - 7:30 PM',
-        'urgency': 1,
-        'required_skills': 'Communication, Time management',
-        'event_date': '2023-07-16',
-        'participation_status': 'In Progress',
-        'volunteer_id': 1
-    },
-    {
-        'id': 3,
-        'event_name': 'Community Clean-up',
-        'event_description': 'Cleaning up the local community park',
-        'location': 'Houston, TX (77002)',
-        'event_time': '9:00 AM - 12:00 PM',
-        'urgency': 3,
-        'required_skills': 'Leadership, Teamwork',
-        'event_date': '2023-07-17',
-        'participation_status': 'In Progress',
-        'volunteer_id': 2
-    }
-]
+#Skill Model
+class Skill(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
 
+#State Model
+class State(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(2), nullable=False, unique=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
+    users = db.relationship('User', backref='state', lazy=True)
+    events = db.relationship('Event', backref='state', lazy=True)
+
+
+#All Pages =====================================================================
+
+#Main index page
+#Add register button
 @app.route("/")
 def index():
-    return render_template("index.html", volunteers=volunteers)
+    form = LoginForm()
+    return render_template("index.html", form = form)
+
+#About page
+#Remake to have info on all teammates and who was in charge of what
 @app.route("/about") # flask url_for 
 def about():
     return render_template("about.html")
 
+#Test Page : Outputs all Databases Data
+#Outputs: SKILL, EVENT, NOTIFICATION, USER
+@app.route("/test")
+def test_db_output():
+    skills = Skill.query.all()
+    states = State.query.all()
+    users = User.query.all()
+    events = Event.query.all()
+    notifications = Notification.query.all()
+    return render_template("test.html", skills=skills, states=states, users=users, events=events, notifications=notifications)
+
+
+#User Profile System -----------------------------------------------------------
+
+#Login Page
+@app.route("/login", methods=['POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data # password recived from form/html.file
+        user = User.query.filter_by(email=email).first()
+        
+        if user and check_password_hash(user.password, password): #check_password_hash(pwhash, password)
+            session['email'] = email
+            flash(f"Welcome back, {user.name}!", "success")
+            return redirect(url_for('profile', email=email))
+        else:
+            flash("Invalid email or password.", "danger")
+    
+    return render_template("index.html", form=form)
+
+
+@app.route("/about") # flask url_for 
+def about():
+    return render_template("about.html")
+
+#Register Page
 @app.route("/register", methods=['GET','POST'])
 def register():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        role = request.form['role']
+    form = RegisterForm()
+    if form.validate_on_submit(): #validating
+        hashed_password = generate_password_hash(form.password.data ) #method='sha256'
+
         
-        #save to db here later
-       
-        return redirect(url_for('profile'))
+        new_user = User(
+            name='',
+            email=form.email.data,
+            password=hashed_password,  
+            role=form.role.data,
+            address='',
+            skills='',
+            preferences='',
+            availability=''
+        )
+        db.session.add(new_user)
+        db.session.commit()
 
-    return render_template("register.html")
+        flash("User added, please finish setting up")
+        return redirect(url_for('profile',email=form.email.data))
 
-@app.route("/profile", methods=['GET','POST'])
-def profile():
+    return render_template("register.html", form=form)
+
+#Profile page
+#Use profile id rather than email for url
+@app.route("/profile/<email>", methods=['GET', 'POST'])
+def profile(email):
+
     # captures data entered from profile.html
     if request.method == 'POST':
-
-        full_name = request.form['full_name']
-        address1 = request.form['address1']
-        address2 = request.form['address2']
-        city = request.form['city']
-        state = request.form['state']
-        zip_code = request.form['zip_code']
-        skills_selected = request.form.getlist('skills')
-        preferences = request.form['preferences']
-        availability_dates = request.form.getlist('availability[]')
-
-        # save to database add later
-
-        return "Profile successfully updated!"
-    return render_template("profile.html", states=states, skills=skills)
-
-@app.route("/notificationSystem")
-def notificationManager():
-    return render_template("notificationSystem.html")
+        user = User.query.filter_by(email=email).first()
+        user.name = request.form['full_name']
+        user.address = request.form['address1'] + ' ' + request.form['address2']+ ', ' + request.form['city']+ ', ' + request.form['state']+', ' + request.form['zip_code']
+        user.skills = ', '.join(request.form.getlist('skills[]'))
+        user.preferences = request.form['preferences']
+        user.availability = ', '.join(request.form.getlist('availability[]'))
+        db.session.commit()
+        flash("Profile updated successfully.", "success")
+        return redirect(url_for('index'))
+   
+    return render_template("profile.html", states=states, skills=skills, email=email)
 
 
-@app.route("/notification", methods=['GET','POST'])
-def notification():
+#Notification System -----------------------------------------------------------
+
+#Main notification page
+@app.route("/notification")
+def notification_main():
+    notifications = Notification.query.all()
+    return render_template("notification-main.html", notifications=notifications)
+
+#Create notification page
+@app.route("/notification/create", methods=['GET','POST'])
+def notification_create():
     form = NotificationForm()
-    if form.validate_on_submit():
-        notification_data['notifName'] = form.notifName.data
-        notification_data['notifDesc'] = form.notifDesc.data
-        
-        flash(f'Notification Sent! : {form.notifName.data} <br> {form.notifDesc.data}','success')
-        
-        return redirect(url_for('notification'))
-    return render_template('notification.html', form=form)
+    events = Event.query.all()
 
-@app.route("/eventCreator", methods=['GET','POST'])
-def eventCreator():
+    if form.validate_on_submit():
+        notification = Notification(
+            name = form.name.data,
+            description = form.description.data,
+            event_id = form.event_id.data
+        )
+        db.session.add(notification)
+        db.session.commit()
+        flash(f'Notification Sent! : {form.name.data}','success')
+        
+        return redirect(url_for('notification_create'))
+    return render_template('notification-create.html', form=form)
+
+
+#Event System ------------------------------------------------------------------
+
+#Main event page
+@app.route("/event")
+def event_main():
+    events = Event.query.all()
+    return render_template("event-main.html", events=events)
+
+#Event page for specified event
+@app.route("/event/<int:event_id>")
+def event_view(event_id):
+    event = Event.query.get_or_404(event_id)
+    notifications = Notification.query.filter_by(event_id=event_id).all()
+    return render_template("event-view.html", event=event, event_id=event_id, notifications=notifications)
+
+#Create event page
+#Make it accessible to admins only
+@app.route("/event/create", methods=['GET','POST'])
+def event_create():
     form = EventCreateForm()
-    if form.validate_on_submit():
-        eventName = form.eventName.data
-        eventDesc = form.eventDesc.data
-        eventDate = form.eventDate.data
-        urgency = form.urgency.data
-        eventAddress = form.eventAddress.data
-        country = form.country.data
-        state = form.state.data
-        zipcode = form.zipcode.data
-        requiredSkills = form.requiredSkills.data
+    form.state.choices = [(state.id, state.name) for state in State.query.all()]
+    form.skills.choices = [(skill.id, skill.name) for skill in Skill.query.all()]
 
-        flash(f'The Event : {form.eventName.data} has been successfully created','success')
+    if form.validate_on_submit():
+        event = Event(
+        name = form.name.data,
+        description = form.description.data,
+        date = form.date.data,
+        urgency = form.urgency.data,
+        address = form.address.data,
+        city = form.city.data,
+        state_id = form.state.data,
+        zipcode = form.zipcode.data,
+        user_id = 1 #REPLACE WITH ACTUAL USER ID
+        )
+        event.skills = Skill.query.filter(Skill.id.in_(form.skills.data)).all()
+        db.session.add(event)
+        db.session.commit()
+        flash(f'The Event : {form.name.data} has been successfully created','success')
 
         form = EventCreateForm()
         
-        return redirect(url_for('eventCreator'))
-    return render_template("eventCreator.html", form=form)
+        return redirect(url_for('event_create'))
+    return render_template("event-create.html", form=form)
 
-@app.route("/eventManager", methods=['GET','POST'])
-def eventManager():
-    form = EventManageForm(obj=event_data)
-    #form.eventName.data = event_data['eventName']
+#Event management page
+#Make it only accessible to Admins
+@app.route("/event/<int:event_id>/manage", methods=['GET','POST'])
+def event_manage(event_id):
+    event = Event.query.get_or_404(event_id)
+    form = EventManageForm(obj=event)
+    form.state.choices = [(state.id, state.name) for state in State.query.all()]
+    form.skills.choices = [(skill.id, skill.name) for skill in Skill.query.all()]
+
     if request.method == 'GET':
-        form.eventName.data = event_data['eventName']
-        form.eventDesc.data = event_data['eventDesc']
-        form.eventDate.data = event_data['eventDate']
-        form.urgency.data = event_data['urgency']
-        form.eventAddress.data = event_data['eventAddress']
-        form.country.data = event_data['country']
-        form.state.data = event_data['state']
-        form.zipcode.data = event_data['zipcode']
-        form.requiredSkills.data = event_data['requiredSkills']
+        form.name.data = event.name
+        form.description.data = event.description
+        form.date.data = event.date
+        form.urgency.data = event.urgency
+        form.address.data = event.address
+        form.city.data = event.city
+        form.state.data = event.state
+        form.zipcode.data = event.zipcode
+        form.skills.data = event.skills
     if form.validate_on_submit():
-        #form.populate_obj(event_data)
-        event_data['eventName'] = form.eventName.data
-        event_data['eventDesc'] = form.eventDesc.data
-        event_data['eventDate'] = form.eventDate.data
-        event_data['urgency'] = form.urgency.data
-        event_data['eventAddress'] = form.eventAddress.data
-        event_data['country'] = form.country.data
-        event_data['state'] = form.state.data
-        event_data['zipcode'] = form.zipcode.data
-        event_data['requiredSkills'] = form.requiredSkills.data
+        event.name = form.name.data
+        event.description = form.description.data
+        event.date = form.date.data
+        event.urgency = form.urgency.data
+        event.address = form.address.data
+        event.state_id = form.state.data
+        event.zipcode = form.zipcode.data
+        event.skills = Skill.query.filter(Skill.id.in_(form.skills.data)).all()
+        db.session.commit()
 
-        flash(f'The Event : {form.eventName.data} has been successfully updated','success')
-        return redirect(url_for('eventManager'))
-    print("Event Data: ", event_data)
-    print("Form Data: ", form.data)
+        flash(f'The Event : {form.name.data} has been successfully updated','success')
+        return redirect(url_for('event_manage', event_id=event_id))
 
-    return render_template("eventManager.html", form=form, event=event_data)
+    return render_template("event-manage.html", form=form, event=event, event_id=event_id)
 
-@app.route("/event")
-def event():
-    return render_template("event.html")
 
-class EventSelectionForm(FlaskForm):
-    event_id = HiddenField('Event ID', validators=[DataRequired()])
-    submit = SubmitField('Select Event')
 
-class VolunteerSelectionForm(FlaskForm):
-    volunteer_id = HiddenField('Volunteer ID', validators=[DataRequired()])
-    submit = SubmitField('Select Volunteer')
+#Admin and Volunteer Systems ===================================================
 
-def match_volunteers_to_events(volunteers, events):
-    matches = []
-    for event in events:
-        required_skills = set(event['required_skills'].split(', '))
-        for volunteer in volunteers:
-            volunteer_skills = set(volunteer['skills'].split(', '))
-            if required_skills.issubset(volunteer_skills):
-                matches.append((volunteer, event))
-    return matches
-
+#Admin page
 @app.route("/admin", methods=['GET', 'POST'])
 def admin():
     form = EventSelectionForm()
@@ -244,6 +308,7 @@ def admin():
         return redirect(url_for('view_event', event_id=event_id))
     return render_template("adminEvents.html", events=events, form=form)
 
+#Missing Label
 @app.route("/admin/event/<int:event_id>", methods=['GET', 'POST'])
 def view_event(event_id):
     form = VolunteerSelectionForm()
@@ -259,6 +324,7 @@ def view_event(event_id):
 
     return render_template("adminMatching.html", event=selected_event, volunteers=matched_volunteers, form=form, success_message=success_message)
 
+#Volunteer Page
 @app.route("/volunteer", methods=['GET', 'POST'])
 def volunteer():
     form = EventSelectionForm()
@@ -274,13 +340,28 @@ def volunteer():
 
     return render_template("volunteerMatching.html", volunteer=volunteer, events=matched_events, form=form, success_message=success_message)
 
-
+#Volunteer's history page
 @app.route("/history/<int:volunteer_id>")
 def history(volunteer_id):
     volunteer = next((v for v in volunteers if v['id'] == volunteer_id), None)
     volunteer_events = [event for event in events if event['volunteer_id'] == volunteer_id]
     return render_template("history.html", volunteer=volunteer, events=volunteer_events)
 
+#End of pages ==================================================================
+
+
+#PLEASE LABEL THIS
+def match_volunteers_to_events(volunteers, events):
+    matches = []
+    for event in events:
+        required_skills = set(event['required_skills'].split(', '))
+        for volunteer in volunteers:
+            volunteer_skills = set(volunteer['skills'].split(', '))
+            if required_skills.issubset(volunteer_skills):
+                matches.append((volunteer, event))
+    return matches
+
+#Place holder for Pricing Module
 class PricingModule:
     def __init__(self):
         self.prices = {}
@@ -291,4 +372,12 @@ class PricingModule:
     def get_price(self, item):
         return self.prices.get(item, None)
 
-if __name__ == '__main__': app.run(host='0.0.0.0', debug=True) # starts server
+
+#Runs server locally ===========================================================
+#Debug=True allows site to update as it detects changes in these files
+#Updating py files will crash server
+#Updating html files will show changes on page refresh 
+if __name__ == '__main__': 
+    with app.app_context():
+        db.create_all()
+    app.run(host='0.0.0.0', debug=True)

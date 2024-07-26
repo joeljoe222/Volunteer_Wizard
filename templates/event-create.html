@@ -3,8 +3,8 @@
 <div class="container">
     <main>
         <div class="col-md-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
-            <h2>Manage Event</h2>
-            <form method="POST" action="{{url_for('eventManager')}}">
+            <h2>Create Event</h2>
+            <form method="POST" action="{{url_for('event_create')}}">
                 {{ form.hidden_tag() }}
 
 
@@ -12,27 +12,27 @@
 
                     <!--Event Name-->
                     <div class="row-sm-6">
-                        {{form.eventName.label(class='form-control-label')}}
-                        {{form.eventName(class='form-control', placeholder='Event Name')}}
-                        {% for error in form.eventName.errors %}
+                        {{form.name.label(class='form-control-label')}}
+                        {{form.name(class='form-control', placeholder='Event Name')}}
+                        {% for error in form.name.errors %}
 						    <div class="text-danger">{{ error }}</div>
 					    {% endfor %}
                     </div>
 
                     <!--Event Description-->
                     <div class="row-sm-6">
-                        {{form.eventDesc.label(class='form-control-label')}}
-                        {{form.eventDesc(class='form-control', placeholder='Event Details')}}
-                        {% for error in form.eventDesc.errors %}
+                        {{form.description.label(class='form-control-label')}}
+                        {{form.description(class='form-control', placeholder='Event Details')}}
+                        {% for error in form.description.errors %}
 						    <div class="text-danger">{{ error }}</div>
 					    {% endfor %}
                     </div>
 
                     <!--Event Date : Has a date picker | Dates prior to current date are disabled-->
                     <div class="col-md-6">
-                        {{form.eventDate.label(class='form-control-label')}}
-                        {{form.eventDate(class='form-control',placeholder='Event Date')}}
-                        {% for error in form.eventDate.errors %}
+                        {{form.date.label(class='form-control-label')}}
+                        {{form.date(class='form-control',placeholder='Event Date')}}
+                        {% for error in form.date.errors %}
 						    <div class="text-danger">{{ error }}</div>
 					    {% endfor %}
                     </div>
@@ -49,23 +49,23 @@
                     <!--Event Address :
                     Taken apart by 
                     Address[string] 
-                    country[string/searchable selection]
+                    city[string/searchable selection]
                     state[searchable selection]
                     zipcode[string/int limit min/max]
                     
                     Address-->
                     <div class="col-12">
-                        {{form.eventAddress.label(class='form-control-label')}}
-                        {{form.eventAddress(class='form-control',placeholder='1234 Main St')}}
-                        {% for error in form.eventAddress.errors %}
+                        {{form.address.label(class='form-control-label')}}
+                        {{form.address(class='form-control',placeholder='1234 Main St')}}
+                        {% for error in form.address.errors %}
 						    <div class="text-danger">{{ error }}</div>
 					    {% endfor %}
                     </div>
-                    <!--Country-->
+                    <!--city-->
                     <div class="col-md-5">
-                        {{form.country.label(class='form-control-label')}}
-                        {{form.country(class='form-control',placeholder='Country')}}
-                        {% for error in form.country.errors %}
+                        {{form.city.label(class='form-control-label')}}
+                        {{form.city(class='form-control',placeholder='city')}}
+                        {% for error in form.city.errors %}
 						    <div class="text-danger">{{ error }}</div>
 					    {% endfor %}
                     </div>
@@ -88,9 +88,9 @@
 
                     <!--Required Skills : searchable Multiselect dropdown menu-->
                     <div class="col-12 pb-3">
-                        {{form.requiredSkills.label(class='form-control-label')}}
-                        {{form.requiredSkills(class='form-control',placeholder='Required Skills')}}
-                        {% for error in form.requiredSkills.errors %}
+                        {{form.skills.label(class='form-control-label')}}
+                        {{form.skills(class='form-control',placeholder='Required Skills')}}
+                        {% for error in form.skills.errors %}
 						    <div class="text-danger">{{ error }}</div>
 					    {% endfor %}
                     </div>
@@ -99,20 +99,6 @@
                     {{form.submit(class='w-100 btn btn-primary btn-lg')}}
                 </div>
             </form>
-
-            <!-- Display current event data -->
-            <h3>Current Event Data:</h3>
-            <ul>
-                <li>Name: {{ event['eventName'] }}</li>
-                <li>Description: {{ event['eventDesc'] }}</li>
-                <li>Date: {{ event['eventDate'] }}</li>
-                <li>Urgency: {{ event['urgency'] }}</li>
-                <li>Address: {{ event['eventAddress'] }}</li>
-                <li>Country: {{ event['country'] }}</li>
-                <li>State: {{ event['state'] }}</li>
-                <li>Zipcode: {{ event['zipcode'] }}</li>
-                <li>Required Skills: {{ event['requiredSkills'] | join(', ') }}</li>
-            </ul>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -133,7 +119,7 @@
 
 <script>
     $(document).ready(function() {
-        $('#requiredSkills').select2({
+        $('#skills').select2({
             theme: "bootstrap-5",
             width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
             placeholder: $( this ).data( 'placeholder' ),
@@ -141,7 +127,7 @@
         });
 
         var today = new Date().toISOString().split('T')[0];
-        document.getElementById('eventDate').setAttribute('min', today);
+        document.getElementById('date').setAttribute('min', today);
     });
 </script>
 

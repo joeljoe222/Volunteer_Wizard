@@ -29,19 +29,21 @@
                         <a class="nav-link" href="{{url_for('register')}}">Register</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('event')}}">Event Page</a>
+                        <a class="nav-link" href="{{url_for('event_main')}}">Event Page</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('eventCreator')}}">Create Event</a>
+                        <a class="nav-link" href="{{url_for('event_create')}}">Create Event</a>
+                    </li>
+                    <!--
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('event_manage', event_id=1)}}">Manage Event</a>
+                    </li>
+                    -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('notification_main')}}">Notifications Page</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('eventManager')}}">Manage Event</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('notificationManager')}}">Notification Page</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('notification')}}">Make a Notification</a>
+                        <a class="nav-link" href="{{url_for('notification_create')}}">Create Notification</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{url_for('volunteer')}}">Volunteer Page</a>
@@ -70,7 +72,19 @@
         </div>
     </nav>
     <div class="p-2"></div>
-
+    <div class="container">
+        <!-- Flash messages block -->
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
+        <div class="alert alert-dismissible fade show mt-3">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+    </div>
     {% block content %} {% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

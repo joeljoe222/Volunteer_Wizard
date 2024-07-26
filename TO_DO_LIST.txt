@@ -1,0 +1,60 @@
+================================================================================
+	Files : Descriptions
+
+DB_ClearAll		: Clears All Databases || Clear Databases if there are issues with DBs
+DB_ClearAll_AddSample	: Reinitializes Databases with Sample Databases || Good practice is to run this before Debugging
+================================================================================
+
+
+================================================================================
+	Everyone : Good Practices while working
+
+-Double check requirements from previous assignments and make sure you still meet them
+-Clarify and cleaning up code : This is a suggestion just to clean up our code and maintain readability, these are based of suggestions for each language
+	+Do not abbreviate variables
+	+Comment all code - before final presentation
+	Python:
+       	change all variables and functions to snake_case
+       	change all classes to CamelCase
+       	constants are capatilized MAX_ATTEMPTS
+	   	classes for models should not end in s ex: Events
+	HTML:
+       	change URLs to use dashes event-main, event-create
+-Remove all hardcoded data once databases are fully set up
+================================================================================
+
+
+================================================================================
+Joels things to get done
+1. Create database
+2. store login details in DB
+3. store profile info in DB
+4. Access DB for authentication
+5. Manage Access volunteer vs ADMIN
+================================================================================
+
+
+================================================================================
+	Jay : Event, Notification
+
+-Create database
+	+Event
+	+Notification
+	+Urgency - maybe? 
+-Make databases update with changes
+	+Do event update?
+	+Do notification update?
+-might have to redo notification database so it stores it based off events to do the following
+	+Make Notifications show up from newest to oldest
+	+Make update in notification main show most recent update
+-ADD BACK DATE OUTPUT IN EVENT-MAIN.HTML
+-Add all forms to forms.py
+-Make own py file for models
+-Unit Testing
+-Double check that u do not create new skills or states or ect.
+-Make skills part of database for event
+-Make event skills show up in manage forms
+-Make sure all forms validate
+-Add manage notification page
+-Update Nav Bar with only links that dont need any id
+================================================================================
