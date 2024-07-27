@@ -8,15 +8,20 @@
 				{{ form.hidden_tag() }}
 
 				<div class="row g-2">
+
+					<!--Notification Name-->
 					<div class="row-sm-6">
 						{{ form.name.label(class='form-control-label') }}
 						{{ form.name(class='form-control', placeholder='Notification Title') }}
 						{% for error in form.name.errors %}
 							<div class="text-danger">{{ error }}</div>
 						{% endfor %}
+					</div>
+
+					<!--Notification Description-->
 					<div class="row-sm-6">
 						{{ form.description.label(class='form-control-label') }}
-						{{ form.description(class='form-control', placeholder='Notification Details') }}
+						{{ form.description(class='form-control', placeholder='Notification Description') }}
 						{% for error in form.description.errors %}
 							<div class="text-danger">{{ error }}</div>
 						{% endfor %}
@@ -29,7 +34,7 @@
 
 			{% with messages = get_flashed_messages(with_categories=true) %}
 				{% if messages %}
-					<div class="alert alert-success">
+					<div class="p-2 alert alert-success">
 						{% for category, message in messages %}
 							<div>{{ message|safe }}</div>
 						{% endfor %}

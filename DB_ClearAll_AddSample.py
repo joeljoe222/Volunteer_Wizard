@@ -95,7 +95,7 @@ with app.app_context():
     #Create a sample users
     #prefrences is commented out in the model add later if missing argument
     #Admin Sample
-    user_admin = User(name='Admin', email='Admin@example.com', password='password', role='2', address='address', state_id=state_objs[1].id, availability='avalability')
+    user_admin = User(name='Admin', email='Admin@example.com', password='password', role='2', address='address', state_id=state_objs[1].id,preferences='preferences', availability='avalability')
     user_admin.skills.extend(skill_objs[:3])
 
     db.session.add(user_admin)
@@ -108,7 +108,7 @@ with app.app_context():
     print(f'Password: {user_admin.password}')
     
     #Volunteer Sample
-    user_volunteer = User(name='Volunteer', email='Volunteer@example.com', password='password', role='1', address='address', state_id=state_objs[2].id, availability='avalability')
+    user_volunteer = User(name='Volunteer', email='Volunteer@example.com', password='password', role='1', address='address', state_id=state_objs[2].id,preferences='preferences', availability='avalability')
     user_volunteer.skills.extend(skill_objs[:3])
 
     db.session.add(user_volunteer)

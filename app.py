@@ -1,9 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from forms import NotificationForm, EventCreateForm, EventManageForm, RegisterForm, LoginForm, EventSelectionForm, VolunteerSelectionForm
+from forms import NotificationForm, EventCreateForm, EventManageForm, RegisterForm, LoginForm, EventSelectionForm, VolunteerSelectionForm, VolunteerHistoryForm
 from flask_sqlalchemy import SQLAlchemy 
 from datetime import datetime  
 from werkzeug.security import generate_password_hash, check_password_hash
-
 
 
 app = Flask(__name__)
@@ -11,7 +10,6 @@ app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
 
-from forms import NotificationForm, EventCreateForm, EventManageForm, RegisterForm, LoginForm, EventSelectionForm, VolunteerSelectionForm, VolunteerHistoryForm
 
 #Define association for skills - used for matching module possibly?
 event_skills = db.Table('event_skills',
@@ -28,7 +26,9 @@ user_skills = db.Table('user_skills',
 
 #User Model
 '''
-User Profile Management (After registration, users should log in first to complete their profile). Following fields will be on the profile page/form:
+`Login (Allow volunteers and administrators to register if not registered yet)
+`User Registration (Initially only username (use email) and password)
+`User Profile Management (After registration, users should log in first to complete their profile). Following fields will be on the profile page/form:
 Full Name (50 characters, required)
 Address 1 (100 characters, required)
 Address 2 (100 characters, optional)
@@ -41,20 +41,43 @@ Availability (Date picker, multiple dates allowed, required)
 '''
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(50), nullable=False)
-    address = db.Column(db.String(200), nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    role = db.Column(db.String(20), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
+    address = db.Column(db.String(100), nullable=False)
+    #address 2
+    #city
     state_id = db.Column(db.Integer, db.ForeignKey('state.id'), nullable=False)
+    #zipcode
     skills = db.relationship('Skill', secondary=user_skills, backref=db.backref('users', lazy='dynamic'))
     preferences = db.Column(db.String(200), nullable=False)
-    availability = db.Column(db.String(200))
+    availability = db.Column(db.String(200), nullable=False)
+    volunteer_histories = db.relationship('VolunteerHistory', backref='volunteer', lazy=True)
+
+
+#Volunteer History Model
+class VolunteerHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    volunteer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    participation_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    status = db.Column(db.String(50), nullable=False)
 
     def __repr__(self):
-        return '<Name %r>' % self.id
+        return f'<VolunteerHistory {self.volunteer_id}-{self.event_id}>'
     
+
 #Event Model
+'''
+Event Management Form (Administrators can create and manage events). The form should include:
+Event Name (100 characters, required)
+Event Description (Text area, required)
+Location (Text area, required)
+Required Skills (Multi-select dropdown, required)
+Urgency (Drop down, selection required)
+Event Date (Calendar, date picker)
+'''
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -101,6 +124,7 @@ class VolunteerHistory(db.Model):
 
 #Main index page
 #Add register button
+#Exception thrown when submit
 @app.route("/")
 def index():
     form = LoginForm()
@@ -127,6 +151,7 @@ def test_db_output():
 #User Profile System -----------------------------------------------------------
 
 #Login Page
+#What does this page do? Method Not Allowed error
 @app.route("/login", methods=['POST'])
 def login():
     form = LoginForm()
@@ -146,6 +171,7 @@ def login():
 
 
 #Register Page
+#Exception thrown when submit
 @app.route("/register", methods=['GET','POST'])
 def register():
     form = RegisterForm()
@@ -173,6 +199,7 @@ def register():
 
 #Profile page
 #Use profile id rather than email for url
+#How to get to this page? name error thrown
 @app.route("/profile/<email>", methods=['GET', 'POST'])
 def profile(email):
 
@@ -194,12 +221,14 @@ def profile(email):
 #Notification System -----------------------------------------------------------
 
 #Main notification page
+#Make Updates only display most recent notification from each event
 @app.route("/notification")
 def notification_main():
     notifications = Notification.query.all()
     return render_template("notification-main.html", notifications=notifications)
 
 #Create notification page
+#Have a notification create for an event id and flash to the event page with the new notification displaying
 @app.route("/notification/create", methods=['GET','POST'])
 def notification_create():
     form = NotificationForm()
@@ -222,12 +251,14 @@ def notification_create():
 #Event System ------------------------------------------------------------------
 
 #Main event page
+#Complete?
 @app.route("/event")
 def event_main():
     events = Event.query.all()
     return render_template("event-main.html", events=events)
 
 #Event page for specified event
+#Complete?
 @app.route("/event/<int:event_id>")
 def event_view(event_id):
     event = Event.query.get_or_404(event_id)
@@ -236,6 +267,7 @@ def event_view(event_id):
 
 #Create event page
 #Make it accessible to admins only
+#Once submitted flash to the new event page
 @app.route("/event/create", methods=['GET','POST'])
 def event_create():
     form = EventCreateForm()
@@ -266,6 +298,8 @@ def event_create():
 
 #Event management page
 #Make it only accessible to Admins
+#Skills dont display
+#Return to event view page once submit with flash message
 @app.route("/event/<int:event_id>/manage", methods=['GET','POST'])
 def event_manage(event_id):
     event = Event.query.get_or_404(event_id)
@@ -303,7 +337,10 @@ def event_manage(event_id):
 
 #Admin and Volunteer Systems ===================================================
 
+#Comment what wach route is
+
 #Admin page
+#You can use events page to format this page to show all events
 @app.route("/admin")
 def admin():
     form = EventSelectionForm()
@@ -313,16 +350,19 @@ def admin():
         return redirect(url_for('view_event', event_id=event_id))
     return render_template("adminEvents.html", events=events, form=form)
 
+#Same route to this page as above? mistake maybe
 @app.route("/admin")
 def admin_dashboard():
     events = Event.query.all()
     return render_template("adminEvents.html", events=events)
 
+#Undefined error and how would one get to this page normally?
 @app.route("/admin/events")
 def admin_events():
     events = Event.query.all()
     return render_template("adminEvents.html", events=events)
 
+#this can also be formatted like event_view page showing volunteers instead of notifications
 @app.route("/admin/event/<int:event_id>", methods=['GET', 'POST'])
 def admin_match(event_id):
     event = Event.query.get_or_404(event_id)
@@ -342,6 +382,7 @@ def admin_match(event_id):
     return render_template("adminMatching.html", event=event, volunteers=volunteers, form=form)
 
 #Missing Label
+#Same route as above?
 @app.route("/admin/event/<int:event_id>", methods=['GET', 'POST'])
 def view_event(event_id):
     form = VolunteerSelectionForm()
@@ -358,6 +399,8 @@ def view_event(event_id):
     return render_template("adminMatching.html", event=selected_event, volunteers=matched_volunteers, form=form, success_message=success_message)
 
 #Volunteer Page
+#good job on the flash btw
+#Unfinished
 @app.route("/volunteer", methods=['GET', 'POST'])
 def volunteer():
     form = EventSelectionForm()
@@ -381,6 +424,7 @@ def volunteer():
     return render_template("volunteerMatching.html", volunteer=volunteer, events=matched_events, form=form)
 
 #volunteer dashboard
+#Will you also display volunteer history here?
 @app.route("/volunteer/<int:volunteer_id>")
 def volunteer_dashboard(volunteer_id):
     volunteer = User.query.get_or_404(volunteer_id)
@@ -389,13 +433,15 @@ def volunteer_dashboard(volunteer_id):
     return render_template("volunteerMatching.html", volunteer=volunteer, events=events)
 
 #Volunteer's history page
+#Can this just be displayed in route above? or will above site displayed only recent events and this show full history?
 @app.route("/history/<int:volunteer_id>")
 def history(volunteer_id):
     volunteer = User.query.get_or_404(volunteer_id)
     history = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
     return render_template("history.html", volunteer=volunteer, history=history)
 
-
+#no template found
+#What would this page do? like an admin would confirm a volunteers participation in an event?
 @app.route('/history/add', methods=['GET', 'POST'])
 def add_history():
     form = VolunteerHistoryForm()
