@@ -277,7 +277,6 @@ def event_create():
 
 #Event management page
 #Make it only accessible to Admins
-#Skills dont display
 #Return to event view page once submit with flash message
 @app.route("/event/<int:event_id>/manage", methods=['GET','POST'])
 def event_manage(event_id):
@@ -295,7 +294,7 @@ def event_manage(event_id):
         form.city.data = event.city
         form.state.data = event.state
         form.zipcode.data = event.zipcode
-        form.skills.data = event.skills
+        form.skills.data = [skill.id for skill in event.skills]
     if form.validate_on_submit():
         event.name = form.name.data
         event.description = form.description.data

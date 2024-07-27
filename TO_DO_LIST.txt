@@ -39,9 +39,6 @@ Joels things to get done
 	Jay : Event, Notification
 
 Priority:
-	-Make skills part of database for event
-	-Make event skills show up in manage forms
-	-Make sure all forms validate
 
 Later:
 	-Make own py file for models
