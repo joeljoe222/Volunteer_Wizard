@@ -25,20 +25,6 @@ user_skills = db.Table('user_skills',
 #Database Models WIP : Migrate to new file if possible =========================
 
 #User Model
-'''
-`Login (Allow volunteers and administrators to register if not registered yet)
-`User Registration (Initially only username (use email) and password)
-`User Profile Management (After registration, users should log in first to complete their profile). Following fields will be on the profile page/form:
-Full Name (50 characters, required)
-Address 1 (100 characters, required)
-Address 2 (100 characters, optional)
-City (100 characters, required)
-State (Drop Down, selection required) DB will store 2-character state code
-Zip code (9 characters, at least 5-character code required)
-Skills (multi-select dropdown, required)
-Preferences (Text area, optional)
-Availability (Date picker, multiple dates allowed, required)
-'''
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -66,18 +52,8 @@ class VolunteerHistory(db.Model):
 
     def __repr__(self):
         return f'<VolunteerHistory {self.volunteer_id}-{self.event_id}>'
-    
 
 #Event Model
-'''
-Event Management Form (Administrators can create and manage events). The form should include:
-Event Name (100 characters, required)
-Event Description (Text area, required)
-Location (Text area, required)
-Required Skills (Multi-select dropdown, required)
-Urgency (Drop down, selection required)
-Event Date (Calendar, date picker)
-'''
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -112,13 +88,6 @@ class State(db.Model):
     users = db.relationship('User', backref='state', lazy=True)
     events = db.relationship('Event', backref='state', lazy=True)
 
-#Volunteer History Model
-class VolunteerHistory(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    volunteer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
-    participation_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    status = db.Column(db.String(50), nullable=False)
 
 #All Pages =====================================================================
 
