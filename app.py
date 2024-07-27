@@ -308,30 +308,15 @@ def event_manage(event_id):
 
 #Comment what wach route is
 
-#Admin page
-#You can use events page to format this page to show all events
+#Admin page shows the events created
 @app.route("/admin")
 def admin():
     form = EventSelectionForm()
     events = Event.query.all()  # Fetching all events from the database
-    if form.validate_on_submit():
-        event_id = form.event_id.data
-        return redirect(url_for('view_event', event_id=event_id))
     return render_template("adminEvents.html", events=events, form=form)
 
-#Same route to this page as above? mistake maybe
-@app.route("/admin")
-def admin_dashboard():
-    events = Event.query.all()
-    return render_template("adminEvents.html", events=events)
-
-#Undefined error and how would one get to this page normally?
-@app.route("/admin/events")
-def admin_events():
-    events = Event.query.all()
-    return render_template("adminEvents.html", events=events)
-
 #this can also be formatted like event_view page showing volunteers instead of notifications
+#handles form submissions
 @app.route("/admin/event/<int:event_id>", methods=['GET', 'POST'])
 def admin_match(event_id):
     event = Event.query.get_or_404(event_id)
@@ -349,23 +334,6 @@ def admin_match(event_id):
             return redirect(url_for('admin_match', event_id=event.id))
 
     return render_template("adminMatching.html", event=event, volunteers=volunteers, form=form)
-
-#Missing Label
-#Same route as above?
-@app.route("/admin/event/<int:event_id>", methods=['GET', 'POST'])
-def view_event(event_id):
-    form = VolunteerSelectionForm()
-    selected_event = next((event for event in events if event['id'] == event_id), None)
-    matches = match_volunteers_to_events(volunteers, events)
-    matched_volunteers = [match[0] for match in matches if match[1] == selected_event]
-    success_message = None
-
-    if form.validate_on_submit():
-        volunteer_id = form.volunteer_id.data
-        selected_volunteer = next((v for v in volunteers if str(v['id']) == volunteer_id), None)
-        success_message = f'Successfully matched volunteer: {selected_volunteer["name"]} for the event: {selected_event["event_name"]}'
-
-    return render_template("adminMatching.html", event=selected_event, volunteers=matched_volunteers, form=form, success_message=success_message)
 
 #Volunteer Page
 #good job on the flash btw
@@ -392,25 +360,14 @@ def volunteer():
 
     return render_template("volunteerMatching.html", volunteer=volunteer, events=matched_events, form=form)
 
-#volunteer dashboard
-#Will you also display volunteer history here?
-@app.route("/volunteer/<int:volunteer_id>")
-def volunteer_dashboard(volunteer_id):
-    volunteer = User.query.get_or_404(volunteer_id)
-    history = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
-    events = [h.event for h in history if h.event]  # List of events the volunteer is assigned to
-    return render_template("volunteerMatching.html", volunteer=volunteer, events=events)
-
 #Volunteer's history page
-#Can this just be displayed in route above? or will above site displayed only recent events and this show full history?
 @app.route("/history/<int:volunteer_id>")
 def history(volunteer_id):
     volunteer = User.query.get_or_404(volunteer_id)
     history = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
     return render_template("history.html", volunteer=volunteer, history=history)
 
-#no template found
-#What would this page do? like an admin would confirm a volunteers participation in an event?
+#Admin validates volunteer participation
 @app.route('/history/add', methods=['GET', 'POST'])
 def add_history():
     form = VolunteerHistoryForm()

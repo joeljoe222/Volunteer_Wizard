@@ -15,24 +15,19 @@
 
 {% if events %}
     {% for event in events %}
-    <div class="text-center border border-info table-info rounded" style="width: 50%; margin-left: 25%; margin-top: 20px; padding-bottom: 20px;">
-        <b>Event Name:</b>
-        <p>{{ event.name }}</p> 
-        <b>Event Description:</b>
-        <p>{{ event.description }}</p> 
-        <b>Event Location:</b>
-        <p>{{ event.city }}, {{ event.state_id }}, {{ event.zipcode }}</p> 
-        <b>Event Time:</b>
-        <p>{{ event.date.strftime('%Y-%m-%d') }}</p> 
-        <b>Urgency:</b>
-        <p>{{ event.urgency }}</p>
-        <b>Required Skills:</b>
-        <p>{{ event.skills }}</p> 
-        <form method="POST" action="{{ url_for('view_event', event_id=event.id) }}">
-            {{ form.hidden_tag() }}
-            {{ form.event_id(value=event.id) }}
-            {{ form.submit(class="btn btn-primary") }}
-        </form>
+    <div>
+        {% for event in events %}
+        <div>
+            <h2>{{ event.name }}</h2>
+            <p><strong>Description:</strong> {{ event.description }}</p>
+            <p><strong>Date:</strong> {{ event.date.strftime('%Y-%m-%d') }}</p>
+            <p><strong>Urgency:</strong> {{ event.urgency }}</p>
+            <p><strong>Address:</strong> {{ event.address }}, {{ event.city }}, {{ event.state.name }} {{ event.zipcode }}</p>
+            <p><strong>Skills Required:</strong> {% for skill in event.skills %}{{ skill.name }} {% if not loop.last %}, {% endif %}{% endfor %}</p>
+            <a href="{{ url_for('event_manage', event_id=event.id) }}">Manage Event</a>
+        </div>
+        <hr>
+        {% endfor %}
     </div>
     {% endfor %}
 {% else %}
