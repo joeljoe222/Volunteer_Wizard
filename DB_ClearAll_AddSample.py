@@ -1,7 +1,7 @@
 #THIS WILL CLEAR ALL DATABASES
 #This will add skills and states to respective DB
 #This adds sample data to Event, Notification, User DBs
-from app import app, db, Event, Notification, User, Skill, State
+from app import app, db, Event, Notification, User, Skill, State, VolunteerHistory
 from datetime import datetime
 
 #PLACE HOLDER SKILLS PLEASE ADD ACTUAL SKILLS LIST LATER
@@ -195,3 +195,27 @@ with app.app_context():
 
     print('Sample Notifications Created')
     print('Succesfully Cleared Databases and Added Sample Data')
+
+    volunteer = User.query.filter_by(email='Volunteer@example.com').first()
+    event1 = Event.query.filter_by(name='Event One').first()
+    event2 = Event.query.filter_by(name='Event Two').first()
+
+    history1 = VolunteerHistory(
+        volunteer_id=volunteer.id,
+        event_id=event1.id,
+        participation_date=datetime(2024, 8, 1, 10, 30),
+        status="Confirmed"
+    )
+
+    history2 = VolunteerHistory(
+        volunteer_id=volunteer.id,
+        event_id=event2.id,
+        participation_date=datetime(2024, 8, 2, 15, 45),
+        status="Attended"
+    )
+
+    db.session.add(history1)
+    db.session.add(history2)
+    db.session.commit()
+
+    print("Sample Volunteer History added.")

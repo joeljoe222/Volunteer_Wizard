@@ -10,6 +10,7 @@ app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
 
+
 #Define association for skills - used for matching module possibly?
 event_skills = db.Table('event_skills',
     db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True),
@@ -111,6 +112,13 @@ class State(db.Model):
     users = db.relationship('User', backref='state', lazy=True)
     events = db.relationship('Event', backref='state', lazy=True)
 
+#Volunteer History Model
+class VolunteerHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    volunteer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    participation_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    status = db.Column(db.String(50), nullable=False)
 
 #All Pages =====================================================================
 
