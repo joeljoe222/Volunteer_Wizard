@@ -190,19 +190,29 @@ def profile(email):
 #Notification System -----------------------------------------------------------
 
 #Main notification page
-#Make Updates only display most recent notification from each event
 @app.route("/notification")
 def notification_main():
     notifications = Notification.query.all()
-    return render_template("notification-main.html", notifications=notifications)
-
-#Create notification page
-#Have a notification create for an event id and flash to the event page with the new notification displaying
-@app.route("/notification/create", methods=['GET','POST'])
-def notification_create():
-    form = NotificationForm()
     events = Event.query.all()
 
+    notifications_in_event = {}
+    latest_notification_in_event = {}
+
+    for event in events:
+        notifications_in_event[event.id] = [notification for notification in notifications if notification.event_id == event.id]
+        latest_notification = Notification.query.filter_by(event_id=event.id).order_by(Notification.id.desc()).first()
+        if latest_notification:
+            latest_notification_in_event[event.id] = latest_notification
+
+    return render_template("notification-main.html", notifications=notifications, events=events, notifications_in_event=notifications_in_event, latest_notification_in_event=latest_notification_in_event)
+
+#Create notification page
+@app.route("/notification/create/<int:event_id>", methods=['GET','POST'])
+def notification_create(event_id):
+    form = NotificationForm()
+    
+    if request.method == 'GET':
+        form.event_id.data = event_id
     if form.validate_on_submit():
         notification = Notification(
             name = form.name.data,
@@ -213,8 +223,8 @@ def notification_create():
         db.session.commit()
         flash(f'Notification Sent! : {form.name.data}','success')
         
-        return redirect(url_for('notification_create'))
-    return render_template('notification-create.html', form=form)
+        return redirect(url_for('notification_create', event_id=event_id))
+    return render_template('notification-create.html', form=form, event_id=event_id)
 
 
 #Event System ------------------------------------------------------------------

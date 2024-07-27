@@ -65,6 +65,7 @@ states = {
 
 
 with app.app_context():
+    #Clear all databases
     db.drop_all()
     db.create_all()
     print("All Database cleared and recreated.")
