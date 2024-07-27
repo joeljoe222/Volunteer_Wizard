@@ -67,6 +67,7 @@ class VolunteerSelectionForm(FlaskForm):
     volunteer_id = HiddenField('Volunteer ID', validators=[DataRequired()])
     submit = SubmitField('Select Volunteer')
 
+#Volunteer History Form
 class VolunteerHistoryForm(FlaskForm):
     volunteer_id = IntegerField('Volunteer ID', validators=[DataRequired(), NumberRange(min=1)])
     event_id = IntegerField('Event ID', validators=[DataRequired(), NumberRange(min=1)])
