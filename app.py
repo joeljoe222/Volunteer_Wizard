@@ -32,10 +32,8 @@ class User(db.Model):
     role = db.Column(db.String(20), nullable=False)
     name = db.Column(db.String(50), nullable=False)
     address = db.Column(db.String(100), nullable=False)
-    #address 2
-    #city
+    #address2 = db.Column(db.String(100))
     state_id = db.Column(db.Integer, db.ForeignKey('state.id'), nullable=False)
-    #zipcode
     skills = db.relationship('Skill', secondary=user_skills, backref=db.backref('users', lazy='dynamic'))
     preferences = db.Column(db.String(200), nullable=False)
     availability = db.Column(db.String(200), nullable=False)

@@ -26,7 +26,7 @@
                     <select class="form-select" id="state" name="state_id" required>
                         <option value="">Select State</option>
                         {% for state in states %}
-                        <option value="{{ state.id }}">{{ state.name }}</option>
+                        <option value="{{ state.code }}">{{ state.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
