@@ -154,7 +154,8 @@ def register():
             password=hashed_password,  
             role=form.role.data,
             address='',
-            skills='',
+            state_id=1,
+            skills=[],
             preferences='',
             availability=''
         )
@@ -171,13 +172,16 @@ def register():
 #How to get to this page? name error thrown
 @app.route("/profile/<email>", methods=['GET', 'POST'])
 def profile(email):
+    user = User.query.filter_by(email=email).first()
+    states = State.query.all()
+    skills = Skill.query.all()
 
     # captures data entered from profile.html
     if request.method == 'POST':
-        user = User.query.filter_by(email=email).first()
         user.name = request.form['full_name']
-        user.address = request.form['address1'] + ' ' + request.form['address2']+ ', ' + request.form['city']+ ', ' + request.form['state']+', ' + request.form['zip_code']
-        user.skills = ', '.join(request.form.getlist('skills[]'))
+        user.address = f"{request.form['address1']} {request.form['address2']}, {request.form['city']}, {request.form['state_id']}, {request.form['zip_code']}"
+        user.state_id = request.form['state_id']
+        user.skills = Skill.query.filter(Skill.id.in_(request.form.getlist('skills[]'))).all()
         user.preferences = request.form['preferences']
         user.availability = ', '.join(request.form.getlist('availability[]'))
         db.session.commit()
