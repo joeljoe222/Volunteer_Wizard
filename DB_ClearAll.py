@@ -1,5 +1,6 @@
 #WARNING RUNNING THIS WILL CLEAR AND RESET ALL DATABASES
-from app import app, db
+from app import app
+from models import db
 
 with app.app_context():
     db.drop_all()

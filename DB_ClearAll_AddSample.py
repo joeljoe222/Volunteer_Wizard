@@ -1,7 +1,8 @@
 #THIS WILL CLEAR ALL DATABASES
 #This will add skills and states to respective DB
 #This adds sample data to Event, Notification, User DBs
-from app import app, db, Event, Notification, User, Skill, State, VolunteerHistory
+from app import app 
+from models import db, Event, Notification, User, Skill, State, VolunteerHistory
 from datetime import datetime
 
 #PLACE HOLDER SKILLS PLEASE ADD ACTUAL SKILLS LIST LATER
