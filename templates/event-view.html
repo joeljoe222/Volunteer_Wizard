@@ -34,7 +34,7 @@
 						{% endfor %}
 					</ul>
 	
-					{% if session['role'] == 'admin'%}
+					{% if session['role'] == 'admin' %}
 					<div class="row py-2">
 						<div class="col">
 							<a href="{{ url_for('event_manage', event_id=event_id) }}" class="btn btn-primary w-100">Manage Event</a>
