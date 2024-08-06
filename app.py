@@ -60,14 +60,19 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data # password recived from form/html.file
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email).first() # user found based on email
+        role = user.role
         
-        if user and check_password_hash(user.password, password): #check_password_hash(pwhash, password)
+        if user and check_password_hash(user.password, password): #checking based on found User
             session['email'] = email
-            session['user_id'] = user.id
-            session['role'] = user.role
-            flash(f"Welcome back, {user.name}!", "success")
-            return redirect(url_for('profile', email=email))
+            if role == 'volunteer':
+                flash(f"Welcome back, {user.name}!", "success")
+
+                return redirect(url_for('event_main'))
+            elif role == 'admin':
+                return redirect(url_for('admin', email=email))
+            else:
+                flash("Role not redined, re-register user before trying to sign in", "danger")
         else:
             flash("Invalid email or password.", "danger")
     
@@ -323,7 +328,7 @@ def view_event(event_id):
 @app.route("/volunteer", methods=['GET', 'POST'])
 def volunteer():
     form = EventSelectionForm()
-    volunteers = User.query.filter_by(role='volunteer').all()  # Fetching all volunteers with role 'volunteer'
+    volunteers = User.query.filter_by(role=1).all()  # Fetching all volunteers with role 'volunteer'
     
     # Check if volunteers list is empty
     if not volunteers:
