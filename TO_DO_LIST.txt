@@ -41,7 +41,6 @@ Joels things to get done
 Priority:
 
 Later:
-	-Make own py file for models
 	-Add manage notification page
 	-When new admin profile created make then used like avolunteer profile until approved by another admin profile
 	-Have flashes appear on the right sites on redirect

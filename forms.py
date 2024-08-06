@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired, Length, Email, NumberRange
 class RegisterForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    role = SelectField('Role', choices=[('1', 'Volunteer'), ('2', 'Administrator')], validators=[DataRequired()])
+    role = SelectField('Role', choices=[('volunteer', 'Volunteer'), ('admin', 'Administrator')], validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 #Existing User Login Form
