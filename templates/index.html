@@ -1,17 +1,14 @@
 {% extends 'base.html' %} {% block content %}
 <div class="container">
-    <div class="col-md-4 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
-        <h2>Login</h2>
-        <form method="POST" action="/login">
-            {{ form.hidden_tag() }}
-            <div class="mb-3">
-                {{ form.email.label(class="form-label") }} {{ form.email(class="form-control") }}
-            </div>
-            <div class="mb-3">
-                {{ form.password.label(class="form-label") }} {{ form.password(class="form-control") }}
-            </div>
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
+    <div class="col-md-6 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
+        <h2>Welcome to Volunteer Wizards</h2>
+        <p>First time users must register and complete their profile. Returning users may log in through the log in portal.
+        </p>
+        <div class="d-flex justify-content-between mt-3">
+            <a href="{{ url_for('register') }}" class="btn btn-secondary">Register</a>
+            <a href="{{ url_for('login') }}" class="btn btn-primary">Log In</a>
+        </div>
+
     </div>
 </div>
 {% endblock %}
