@@ -16,20 +16,7 @@ db.init_app(app)
 #Exception thrown when submit
 @app.route("/")
 def index():
-    form = LoginForm()
-    if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data # password recived from form/html.file
-        user = User.query.filter_by(email=email).first()
-        
-        if user and check_password_hash(user.password, password): #check_password_hash(pwhash, password)
-            session['email'] = email
-            session['user_id'] = user.id
-            session['role'] = user.role
-            flash(f"Welcome back, {user.name}!", "success")
-            return redirect(url_for('profile', email=email))
-        else:
-            flash("Invalid email or password.", "danger")
+    form = LoginForm()   
     return render_template("index.html", form = form)
 
 #About page
@@ -60,17 +47,19 @@ def test_db_output():
 
 #Login Page
 #What does this page do? Method Not Allowed error
-@app.route("/login", methods=['POST'])
+@app.route("/login", methods=['GET','POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data # password recived from form/html.file
         user = User.query.filter_by(email=email).first() # user found based on email
-        role = user.role
+        
         
         if user and check_password_hash(user.password, password): #checking based on found User
+            role = user.role
             session['email'] = email
+            session['role'] = role
             if role == 'volunteer':
                 flash(f"Welcome back, {user.name}!", "success")
 
@@ -82,7 +71,7 @@ def login():
         else:
             flash("Invalid email or password.", "danger")
     
-    return render_template("index.html", form=form)
+    return render_template("login.html", form=form)
 
 
 #Register Page

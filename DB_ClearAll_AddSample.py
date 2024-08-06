@@ -2,12 +2,28 @@
 #This will add skills and states to respective DB
 #This adds sample data to Event, Notification, User DBs
 from app import app 
-from models import db, Event, Notification, User, Skill, State, VolunteerHistory
+from models import db, Event, Notification, User, Skill, State, VolunteerHistory, user_skills, event_skills
 from datetime import datetime
+from werkzeug.security import generate_password_hash
 
 #PLACE HOLDER SKILLS PLEASE ADD ACTUAL SKILLS LIST LATER
 skills = {
-    'skill 1','skill 2','skill 3','skill 4','skill 5'
+    'Lift Heavy Loads',
+    'Stand for Long Periods of Time',
+    'Walk for Long Distances',
+    'Public Speaking',
+    'Photography',
+    'Multilingual',
+    'Organizing Paperwork',
+    'Work well with Children',
+    'Lead Group Activities',
+    'Guide others',
+    'Work with Pets',
+    'Security',
+    'Greet Guests',
+    'Clean inside',
+    'Clean outside',
+    'Conduct Surveys'
 }
 
 #Dictionary of all US states 'TX': 'Texas'
@@ -96,32 +112,85 @@ with app.app_context():
 
     #Create a sample users
     #prefrences is commented out in the model add later if missing argument
-    #Admin Sample
-    user_admin = User(name='Admin', email='Admin@example.com', password='password', role='admin', address='address', state_id=state_objs[1].id,preferences='preferences', availability='avalability')
-    user_admin.skills.extend(skill_objs[:3])
-
-    db.session.add(user_admin)
-    db.session.commit()
-    print('=============================')
-    print('Sample Admin User Created')
-    print('=============================')
-    print(f'Name: {user_admin.name}')
-    print(f'Email: {user_admin.email}')
-    print(f'Password: {user_admin.password}')
     
-    #Volunteer Sample
-    user_volunteer = User(name='Volunteer', email='Volunteer@example.com', password='password', role='volunteer', address='address', state_id=state_objs[2].id,preferences='preferences', availability='avalability')
-    user_volunteer.skills.extend(skill_objs[:3])
+    users = [
+        {
+            'name':'Admin',
+            'email':'admin@email.com',
+            'password':'password',
+            'role':'admin',
+            'address':'1234 main st',
+            'state_id': 1,
+            'preferences':'preferences',
+            'availability':'availible',
+            'skills':[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+        },
+        {
+            'name':'Volunteer',
+            'email':'volunteer@email.com',
+            'password':'password',
+            'role':'volunteer',
+            'address':'1234 main st',
+            'state_id': 2,
+            'preferences':'preferences',
+            'availability':'availible',
+            'skills':[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+        },
+        {
+            'name':'Jane Doe',
+            'email':'janedoe@email.com',
+            'password':'password',
+            'role':'volunteer',
+            'address':'1234 main st',
+            'state_id': 3,
+            'preferences':'preferences',
+            'availability':'availible',
+            'skills':[1,2,3,4,5]
+        },
+        {
+            'name':'John Smith',
+            'email':'johnsmith@email.com',
+            'password':'password',
+            'role':'volunteer',
+            'address':'1234 main st',
+            'state_id': 4,
+            'preferences':'preferences',
+            'availability':'availible',
+            'skills':[6,7,8,9,10]
+        },
+        {
+            'name':'Adam Sandler',
+            'email':'adamsandler@email.com',
+            'password':'password',
+            'role':'volunteer',
+            'address':'1234 main st',
+            'state_id': 4,
+            'preferences':'preferences',
+            'availability':'availible',
+            'skills':[11,12,13,14,15]
+        },
+    ]
+    
+    for user_sample in users:
+        hashed_password = generate_password_hash(user_sample['password']) #method='sha256'
 
-    db.session.add(user_volunteer)
+        user = User(
+            name = user_sample['name'],
+            email = user_sample['email'],
+            password = hashed_password,
+            role = user_sample['role'],
+            address = user_sample['address'],
+            state_id = user_sample['state_id'],
+            preferences = user_sample['preferences'],
+            availability = user_sample['availability'],
+        )
+
+        user.skills = Skill.query.filter(Skill.id.in_(user_sample['skills'])).all()
+
+        db.session.add(user)
+    
     db.session.commit()
-    print('=============================')
-    print('Sample Volunteer User Created')
-    print('=============================')
-    print(f'Name: {user_volunteer.name}')
-    print(f'Email: {user_volunteer.email}')
-    print(f'Password: {user_volunteer.password}')
-    print('=============================')
+    print('Sample users added')
 
 
     #Create sample events
@@ -133,9 +202,10 @@ with app.app_context():
             'urgency': '1',
             'address': '1111 Street Name',
             'city': 'city',
-            'state': state_objs[1],
+            'state_id': 1,
             'zipcode': '11111',
-            'user_id': user_admin.id
+            'user_id': 1,
+            'skills':[1,2,3,4,5]
         },
         {
             'name': 'Event Two',
@@ -144,15 +214,38 @@ with app.app_context():
             'urgency': '2',
             'address': '2222 Street Name',
             'city': 'city222',
-            'state': state_objs[15],
+            'state_id': 2,
             'zipcode': '22222',
-            'user_id': user_admin.id
+            'user_id': 1,
+            'skills':[6,7,8,9,10]
+        },
+        {
+            'name': 'Event Three',
+            'description': 'Description for Event Three',
+            'date': datetime(2025, 3, 3),
+            'urgency': '3',
+            'address': '3333 Street Name',
+            'city': 'city',
+            'state_id': 3,
+            'zipcode': '11111',
+            'user_id': 1,
+            'skills':[11,12,13,14,15]
         }
     ]
 
-    for event_data in events:
-        event = Event(**event_data)
-        event.skills.extend(skill_objs[1:3])
+    for event_sample in events:
+        event = Event(
+            name = event_sample['name'],
+            description = event_sample['description'],
+            date = event_sample['date'],
+            urgency = event_sample['urgency'],
+            address = event_sample['address'],
+            city = event_sample['city'],
+            state_id = event_sample['state_id'],
+            zipcode = event_sample['zipcode'],
+            user_id = event_sample['user_id'],
+        )
+        event.skills = Skill.query.filter(Skill.id.in_(event_sample['skills'])).all()
         db.session.add(event)
     db.session.commit()
 
@@ -198,7 +291,7 @@ with app.app_context():
     print('Sample Notifications Created')
     print('Succesfully Cleared Databases and Added Sample Data')
 
-    volunteer = User.query.filter_by(email='Volunteer@example.com').first()
+    volunteer = User.query.filter_by(email='volunteer@email.com').first()
     event1 = Event.query.filter_by(name='Event One').first()
     event2 = Event.query.filter_by(name='Event Two').first()
 
