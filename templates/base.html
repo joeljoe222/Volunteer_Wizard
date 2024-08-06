@@ -47,7 +47,7 @@
                         <a class="nav-link" href="{{ url_for('history', volunteer_id=1) }}">Volunteer History</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Log out</a>
+                        <a class="nav-link" href="{{ url_for('logout') }}">Log out:{{ session['role'] }}</a>
                     </li>
                     <!--
                     <li class="nav-item dropdown">
