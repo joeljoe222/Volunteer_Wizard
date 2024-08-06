@@ -11,6 +11,7 @@ class RegisterForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
     role = SelectField('Role', choices=[('volunteer', 'Volunteer'), ('admin', 'Administrator')], validators=[DataRequired()])
+    skills = StringField('Skills')  # Added skills, assuming skills are entered comma separated 
     submit = SubmitField('Submit')
 
 #Existing User Login Form

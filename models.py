@@ -15,6 +15,11 @@ user_skills = db.Table('user_skills',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
     db.Column('skill_id', db.Integer, db.ForeignKey('skill.id'), primary_key=True)
 )
+# Association for many-to-many relationship between User and Event
+user_events = db.Table('user_events',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True)
+)
 
 
 #Database Models WIP : Migrate to new file if possible =========================
@@ -32,16 +37,20 @@ class User(db.Model):
     skills = db.relationship('Skill', secondary=user_skills, backref=db.backref('users', lazy='dynamic'))
     preferences = db.Column(db.String(200), nullable=False)
     availability = db.Column(db.String(200), nullable=False)
+    events = db.relationship('Event', secondary='user_events', back_populates='volunteers') #added events 
     volunteer_histories = db.relationship('VolunteerHistory', backref='volunteer', lazy=True)
 
 
 #Volunteer History Model
 class VolunteerHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    volunteer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
-    participation_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    status = db.Column(db.String(50), nullable=False)
+    status = db.Column(db.String(20), nullable=False)  # 'in progress' or 'complete'
+    user = db.relationship('User', backref=db.backref('user_histories', lazy=True), foreign_keys=[user_id])
+    event = db.relationship('Event', backref=db.backref('event_histories', lazy=True), foreign_keys=[event_id])
+
+
 
     def __repr__(self):
         return f'<VolunteerHistory {self.volunteer_id}-{self.event_id}>'
@@ -60,6 +69,7 @@ class Event(db.Model):
     skills = db.relationship('Skill', secondary=event_skills, backref=db.backref('events', lazy='dynamic'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     notifications = db.relationship('Notification', backref='event', lazy=True)
+    volunteers = db.relationship('User', secondary='user_events', back_populates='events') # added volunteers
 
 #Notification Model
 class Notification(db.Model):
