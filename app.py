@@ -17,6 +17,19 @@ db.init_app(app)
 @app.route("/")
 def index():
     form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data # password recived from form/html.file
+        user = User.query.filter_by(email=email).first()
+        
+        if user and check_password_hash(user.password, password): #check_password_hash(pwhash, password)
+            session['email'] = email
+            session['user_id'] = user.id
+            session['role'] = user.role
+            flash(f"Welcome back, {user.name}!", "success")
+            return redirect(url_for('profile', email=email))
+        else:
+            flash("Invalid email or password.", "danger")
     return render_template("index.html", form = form)
 
 #About page
@@ -52,15 +65,14 @@ def login():
         
         if user and check_password_hash(user.password, password): #checking based on found User
             session['email'] = email
-            if role == '1':
+            if role == 'volunteer':
                 flash(f"Welcome back, {user.name}!", "success")
 
                 return redirect(url_for('event_main'))
-            elif role == '2':
+            elif role == 'admin':
                 return redirect(url_for('admin', email=email))
             else:
                 flash("Role not redined, re-register user before trying to sign in", "danger")
-
         else:
             flash("Invalid email or password.", "danger")
     
