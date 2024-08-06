@@ -42,7 +42,7 @@ Priority:
 
 Later:
 	-Add manage notification page
-	-When new admin profile created make then used like avolunteer profile until approved by another admin profile
+	-Add ability for admin to delete events and notifications
 	-Have flashes appear on the right sites on redirect
 ================================================================================
 
