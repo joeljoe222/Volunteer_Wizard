@@ -38,6 +38,12 @@ def index():
 def about():
     return render_template("about.html")
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out.','info')
+    return render_template('about.html')
+
 #Test Page : Outputs all Databases Data
 #Outputs: SKILL, EVENT, NOTIFICATION, USER
 @app.route("/test")
