@@ -44,12 +44,15 @@
 					</ul>
 	
 					{% if session['role'] == 'admin' %}
-					<div class="row py-2">
+					<div class="row pt-2">
+						<div class="col">
+							<a href="{{ url_for('notification_create', event_id=event_id) }}" class="btn btn-primary w-100">Create Notification</a>
+						</div>
 						<div class="col">
 							<a href="{{ url_for('event_manage', event_id=event_id) }}" class="btn btn-primary w-100">Manage Event</a>
 						</div>
 						<div class="col">
-							<a href="{{ url_for('notification_create', event_id=event_id) }}" class="btn btn-primary w-100">Create Notification</a>
+							<a class="btn btn-danger w-100" href="{{ url_for('event_delete',event_id=event_id) }}" onclick="return confirm('Are you sure you want to delete this notification?')">Delete Event</a>
 						</div>
 					</div>
 					{% endif %}
