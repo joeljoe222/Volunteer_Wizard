@@ -165,6 +165,44 @@ def notification_create(event_id):
         return redirect(url_for('notification_create', event_id=event_id))
     return render_template('notification-create.html', form=form, event_id=event_id)
 
+@app.route("/notification/manage/<int:event_id>/<int:notification_id>", methods=['GET','POST'])
+def notification_manage(event_id,notification_id):
+    event = Event.query.get_or_404(event_id)
+    notification = Notification.query.filter_by(event_id=event_id, id=notification_id).first()
+    form = NotificationForm(obj=notification)
+
+    if request.method == 'GET':
+        form.name.data = notification.name
+        form.description.data = notification.description
+    if form.validate_on_submit():
+        notification.name = form.name.data
+        notification.description = form.description.data
+        db.session.commit()
+        flash(f'Notification : {notification.name} succesfully updated!','success')
+        return redirect(url_for('event_view', event_id=event_id))
+    return render_template('notification-manage.html', form=form,event_id=event_id, notification_id=notification_id, event=event, notification=notification)
+
+@app.route("/notification/delete/<int:event_id>/<int:notification_id>", methods=['POST','GET'])
+def notification_delete(event_id,notification_id):
+    notification = Notification.query.filter_by(event_id=event_id, id=notification_id).first()
+    print('enter')
+
+    if session['role'] != 'admin':
+        flash('You do not have permission to delete this notification.', 'danger')
+        return redirect(url_for('event_view',event_id=event_id))
+    try:
+        print('before delete')
+        db.session.delete(notification)
+        db.session.commit()
+        print('after delete')
+        flash('Notification deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('An error occurred while trying to delete the notification.', 'danger')
+        print(f"Error: {e}")
+    return redirect(url_for('event_view',event_id=event_id))
+
+
 
 #Event System ------------------------------------------------------------------
 

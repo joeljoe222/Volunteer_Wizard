@@ -28,9 +28,18 @@
 					<ul class="list-group">
 						{% for notification in notifications %}
 							<li class="list-group-item">
-								<h5>{{ notification.name }}</h5>
+								<div class="d-flex justify-content-between"><h5>{{ notification.name }}</h5>
+									{% if session['role'] == 'admin' %}
+									<div class="btn-group btn-group-sm">
+										<a class="btn btn-outline-primary" href="{{ url_for('notification_manage',event_id=event_id,notification_id=notification.id) }}">Edit</a>
+										<a class="btn btn-outline-danger" href="{{ url_for('notification_delete',event_id=event_id, notification_id=notification.id) }}" onclick="return confirm('Are you sure you want to delete this notification?')">Delete</a>
+									</div>
+									{% endif %}
+								</div>
+								
 								<p>{{ notification.description }}</p>
 							</li>
+							
 						{% endfor %}
 					</ul>
 	

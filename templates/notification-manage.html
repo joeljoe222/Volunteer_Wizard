@@ -1,0 +1,47 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container">
+    <main>
+		<div class="col-md-9 col-sm-10 mx-auto">
+			<div class="row-md-5 p-3 bg-primary bg-opacity-25 border border-info rounded">
+				<h2>Manage Notification for {{ event.name }}</h2>
+				<form method="POST" action="{{url_for('notification_manage', event_id=event_id,notification_id=notification_id)}}">
+					{{ form.hidden_tag() }}
+
+					<div class="row g-2">
+
+						<!--Notification Name-->
+						<div class="row-sm-6">
+							{{ form.name.label(class='form-control-label') }}
+							{{ form.name(class='form-control', placeholder='Notification Title') }}
+							{% for error in form.name.errors %}
+								<div class="text-danger">{{ error }}</div>
+							{% endfor %}
+						</div>
+	
+						<!--Notification Description-->
+						<div class="row-sm-6">
+							{{ form.description.label(class='form-control-label') }}
+							{{ form.description(class='form-control', placeholder='Notification Description') }}
+							{% for error in form.description.errors %}
+								<div class="text-danger">{{ error }}</div>
+							{% endfor %}
+						</div>
+					</div>
+					<div class="row py-2">
+						<div class="col">{{ form.submit(class='btn btn-primary w-100')}}</div>
+						<div class="col"><form action="{{ url_for('notification_delete',event_id=event_id, notification_id=notification.id) }}" >
+							{{ form.hidden_tag() }}
+							<button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to delete this notification?')">Delete</button>
+						</form></div>
+						
+						
+						
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>
+</div>
+
+{% endblock %}
