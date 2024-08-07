@@ -80,12 +80,19 @@ def login():
 def register():
     form = RegisterForm()
     if form.validate_on_submit(): #validating
+        email = form.email.data
+        # Check if email already exists
+        user = User.query.filter_by(email=email).first()
+        if user:
+            # Email already exists
+            flash("Email is already registered. Please use a different email or Log in", "danger")
+            return render_template("register.html", form=form)
         hashed_password = generate_password_hash(form.password.data ) #method='sha256'
 
         
         new_user = User(
             name='',
-            email=form.email.data,
+            email=email,
             password=hashed_password,  
             role=form.role.data,
             address='',
@@ -94,6 +101,7 @@ def register():
             preferences='',
             availability=''
         )
+        
         db.session.add(new_user)
         db.session.commit()
 
