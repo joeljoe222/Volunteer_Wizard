@@ -2,13 +2,21 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from forms import NotificationForm, EventCreateForm, EventManageForm, RegisterForm, LoginForm, EventSelectionForm, VolunteerSelectionForm, VolunteerHistoryForm 
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, VolunteerHistory, Event, Notification, Skill, State
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0b\xb9\xa5\xb6\xd7.\xc3'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db.init_app(app)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
 #All Pages =====================================================================
 
 #Main index page
@@ -27,9 +35,9 @@ def about():
 
 @app.route('/logout')
 def logout():
-    session.clear()
-    flash('You have been logged out.','info')
-    return render_template('about.html')
+    logout_user()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('about'))
 
 #Test Page : Outputs all Databases Data
 #Outputs: SKILL, EVENT, NOTIFICATION, USER
@@ -57,6 +65,7 @@ def login():
         
         
         if user and check_password_hash(user.password, password): #checking based on found User
+            login_user(user)
             role = user.role
             session['email'] = email
             session['role'] = role
@@ -67,7 +76,7 @@ def login():
             elif role == 'admin':
                 return redirect(url_for('admin', email=email))
             else:
-                flash("Role not redined, re-register user before trying to sign in", "danger")
+                flash("Role not refined, re-register user before trying to sign in", "danger")
         else:
             flash("Invalid email or password.", "danger")
     
@@ -115,6 +124,7 @@ def register():
 #Use profile id rather than email for url
 #How to get to this page? name error thrown
 @app.route("/profile/<email>", methods=['GET', 'POST'])
+@login_required
 def profile(email):
     user = User.query.filter_by(email=email).first()
     states = State.query.all()
@@ -132,7 +142,7 @@ def profile(email):
         flash("Profile updated successfully.", "success")
         return redirect(url_for('index'))
    
-    return render_template("profile.html", states=states, skills=skills, email=email)
+    return render_template("profile.html", user=user, states=states, skills=skills)
 
 
 #Notification System -----------------------------------------------------------

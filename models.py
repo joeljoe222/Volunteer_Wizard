@@ -1,5 +1,6 @@
 #not in use at the moment
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 from datetime import datetime
 #from app import db
 
@@ -33,6 +34,20 @@ class User(db.Model):
     preferences = db.Column(db.String(200), nullable=False)
     availability = db.Column(db.String(200), nullable=False)
     volunteer_histories = db.relationship('VolunteerHistory', backref='volunteer', lazy=True)
+    def get_id(self):
+        return str(self.id)
+
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
 
 
 #Volunteer History Model
