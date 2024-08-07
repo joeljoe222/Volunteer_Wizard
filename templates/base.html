@@ -14,7 +14,7 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-primary bg-opacity-25">
+    <nav class="navbar navbar-expand-lg bg-primary bg-opacity-25 gx-5">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{url_for('index')}}">Volunteer_Wizards</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,23 +69,53 @@
             </div>
         </div>
     </nav>
-    <div class="p-2"></div>
-    <div class="container">
-        <!-- Flash messages block -->
-        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
-        <div class="alert alert-dismissible fade show mt-3">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
+
+    <div class="d-flex pt-3 px-4 justify-content-center">
+    <!-- Flash messages block -->
+    {% with messages = get_flashed_messages(with_categories=true) %} 
+    {% if messages %}
+    {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        {% endif %} {% endwith %}
+    {% endfor %}{% endif %} {% endwith %}
     </div>
+
+
     {% block content %} {% endblock %}
 
+
+    <!--First 2 scripts and the skills script is for multiselect dropdown menu-->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+    $(document).ready(function() {
+        $('#skills').select2({
+            theme: "bootstrap-5",
+            width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
+            placeholder: $( this ).data( 'placeholder' ),
+            closeOnSelect: false,
+        });
+
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').setAttribute('min', today);
+    });
+    </script>
+    
+    <script>
+        function addAvailability() {
+            var container = document.getElementById('availabilityInputs');
+            var newInput = document.createElement('input');
+            newInput.type = 'date';
+            newInput.className = 'form-control mt-2';
+            newInput.name = 'availability[]';
+            newInput.required = true;
+            container.appendChild(newInput);
+        }
+    </script>
 </body>
 
 <footer class="my-5 pt-5 text-body-secondary text-center text-small">

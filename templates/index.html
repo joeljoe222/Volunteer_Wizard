@@ -1,6 +1,7 @@
 {% extends 'base.html' %} {% block content %}
+
 <div class="container">
-    <div class="col-md-6 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
+    <div class="col-lg-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
         <h2>Welcome to Volunteer Wizards</h2>
         <p>First time users must register and complete their profile. Returning users may log in through the log in portal.
         </p>
@@ -8,7 +9,7 @@
             <a href="{{ url_for('register') }}" class="btn btn-secondary">Register</a>
             <a href="{{ url_for('login') }}" class="btn btn-primary">Log In</a>
         </div>
-
     </div>
 </div>
+
 {% endblock %}

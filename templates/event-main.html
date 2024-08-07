@@ -1,41 +1,26 @@
 {% extends 'base.html' %} {% block content %}
 
 <div class="container">
-    <main>
-		<div class="col-md-9 col-sm-10 mx-auto">
-			<div class="row-md-5 p-3 bg-primary bg-opacity-25 border border-info rounded">
-				<div>
-					<div>
-						<h1 class="mb-4">List of Events</h1>
-						<ul class="list-group">
-							{% for event in events %}
-								<li class="list-group-item">
-									<h4><a href="{{ url_for('event_view', event_id=event.id) }}">{{ event.name }}</a></h4>
-									<p>{{ event.description }}</p>
+	<div class="col-lg-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">	
+		<h1 class="text-center">Events</h1>
+		<ul class="list-group">
+			{% for event in events %}
+				<li class="list-group-item">
+					<h3 class="text-center"><a href="{{ url_for('event_view', event_id=event.id) }}">{{ event.name }}</a></h3>
+					<p>{{ event.description }}</p>
+					
+					<p class="d-flex justify-content-between"><b>{{ event.date.strftime("%B %d, %Y").replace(" 0", " ") }}</b><b>Urgency: {{ event.urgency }}</b></p>
+					<p><b>Address:</b> {{ event.address }}, {{ event.city }}, {{ event.state.name }}, {{ event.zipcode }}</p>
 
-									<p><strong>Date:</strong> {{ event.date }}</p>
-									<p><strong>Urgency:</strong> {{ event.urgency }}</p>
-									<p><strong>Address:</strong> {{ event.address }}</p>
-									<p><strong>Country:</strong> {{ event.city }}</p>
-									<p><strong>State:</strong> {{ event.state.name }}</p>
-									<p><strong>Zipcode:</strong> {{ event.zipcode }}</p>
-
-									<p><strong>Required Skills:</strong> 
-										{% for skill in event.skills %}
-                            				{{ skill.name }} {% if not loop.last %}, {% endif %}
-                        				{% endfor %}
-									</p>
-
-									
-								</li>
-								
-							{% endfor %}
-						</ul>
-                    </div>
-				</div>
-			</div>
-		</div>
-	</main>
+					<p><b>Required Skills:</b> 
+						{% for skill in event.skills %}
+                            {{ skill.name }} {% if not loop.last %}, {% endif %}
+                        {% endfor %}
+					</p>				
+				</li>	
+			{% endfor %}
+		</ul>			
+	</div>
 </div>
 
 {% endblock %}

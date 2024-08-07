@@ -1,27 +1,26 @@
 {% extends 'base.html' %} {% block content %}
 
 <div class="container">
-    <main>
         <div class="row gy-2">
             <div class="col-md-5 col-lg-4 order-md-last">
                 <div class="row gx-2 p-2 bg-primary bg-opacity-25 border border-info rounded">
                     <h4>Recent Updates</h4>
                     <ul class="list-group">
-                        {% for event in events %}
+                        {% for event in events %}{% if notifications_in_event[event.id] %}
 						<li class="list-group-item">
 							<h4><a href="{{ url_for('event_view', event_id=event.id) }}">{{ event.name }}</a></h4>       
                                 {% if latest_notification_in_event[event.id] %}
-                                <li class="list-group-item">
+                                
                                     <ul>
                                         <li>
                                             <h4>{{ latest_notification_in_event[event.id].name }}</h4>
                                             <p>{{ latest_notification_in_event[event.id].description }}</p>
                                         </li>
                                     </ul>
-                                </li>                                    
+                                                                    
                                 {% endif %}
 						</li>
-						{% endfor %}
+						{% endif %}{% endfor %}
                     </ul>
                 </div>
             </div>
@@ -32,13 +31,13 @@
                         <h4>Notifications</h4>
                         <ul class="list-group">
                             <ul class="list-group">
-                                {% for event in events %}
+                                {% for event in events %}{% if notifications_in_event[event.id] %}
 								<li class="list-group-item">
 									<h4><a href="{{ url_for('event_view', event_id=event.id) }}">{{ event.name }}</a></h4>
                                        
                                     {% for notification in notifications_in_event[event.id] %}
 
-                                    <li class="list-group-item">
+                                    
                                         <h4><a href="{{ url_for('event_view', event_id=notification.event_id) }}">{{ event_id }}</a></h4>
                                         <ul>
                                             <li>
@@ -46,10 +45,10 @@
                                                 <p>{{ notification.description }}</p>
                                             </li>
                                         </ul>
-                                    </li>
+                    
                                     {% endfor %}
 								</li>
-							    {% endfor %}
+							    {% endif %}{% endfor %}
                             </ul>
                         </ul>
                     </div>

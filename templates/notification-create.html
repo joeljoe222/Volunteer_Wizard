@@ -1,48 +1,36 @@
 {% extends 'base.html' %} {% block content %}
 
 <div class="container">
-	<main>
-		<div class="col-md-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
-			<h2>Create Notification</h2>
-			<form method="POST" action="{{url_for('notification_create', event_id=event_id)}}">
-				{{ form.hidden_tag() }}
+	<div class="col-lg-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
+		<h2>Create Notification</h2>
+		<form method="POST" action="{{url_for('notification_create', event_id=event_id)}}">
+			{{ form.hidden_tag() }}
 
-				<div class="row g-2">
+			<div class="row g-2">
 
-					<!--Notification Name-->
-					<div class="row-sm-6">
-						{{ form.name.label(class='form-control-label') }}
-						{{ form.name(class='form-control', placeholder='Notification Title') }}
-						{% for error in form.name.errors %}
-							<div class="text-danger">{{ error }}</div>
-						{% endfor %}
-					</div>
-
-					<!--Notification Description-->
-					<div class="row-sm-6">
-						{{ form.description.label(class='form-control-label') }}
-						{{ form.description(class='form-control', placeholder='Notification Description') }}
-						{% for error in form.description.errors %}
-							<div class="text-danger">{{ error }}</div>
-						{% endfor %}
-					</div>
+				<!--Notification Name-->
+				<div class="row-sm-6">
+					{{ form.name.label(class='form-control-label') }}
+					{{ form.name(class='form-control', placeholder='Notification Title') }}
+					{% for error in form.name.errors %}
+						<div class="text-danger">{{ error }}</div>
+					{% endfor %}
 				</div>
-				<div class="py-2">
-					{{ form.submit(class='w-100 btn btn-primary btn-lg')}}
+
+				<!--Notification Description-->
+				<div class="row-sm-6">
+					{{ form.description.label(class='form-control-label') }}
+					{{ form.description(class='form-control', placeholder='Notification Description') }}
+					{% for error in form.description.errors %}
+						<div class="text-danger">{{ error }}</div>
+					{% endfor %}
 				</div>
-			</form>
-
-			{% with messages = get_flashed_messages(with_categories=true) %}
-				{% if messages %}
-					<div class="p-2 alert alert-success">
-						{% for category, message in messages %}
-							<div>{{ message|safe }}</div>
-						{% endfor %}
-					</div>
-				{% endif %}
-			{% endwith %}
-
-		</div>
-	</main>
+			</div>
+			<div class="py-2">
+				{{ form.submit(class='w-100 btn btn-primary btn-lg')}}
+			</div>
+		</form>
+	</div>
 </div>
+
 {% endblock %}

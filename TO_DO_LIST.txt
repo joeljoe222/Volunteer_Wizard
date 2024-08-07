@@ -41,9 +41,7 @@ Joels things to get done
 Priority:
 
 Later:
-	-Add manage notification page
-	-Add ability for admin to delete events and notifications
-	-Have flashes appear on the right sites on redirect
+	-make matching skills green in admin matching
 ================================================================================
 
 

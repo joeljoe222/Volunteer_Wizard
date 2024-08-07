@@ -82,14 +82,15 @@ def register():
     if form.validate_on_submit(): #validating
         email = form.email.data
         # Check if email already exists
+        
         user = User.query.filter_by(email=email).first()
         if user:
             # Email already exists
             flash("Email is already registered. Please use a different email or Log in", "danger")
             return render_template("register.html", form=form)
-        hashed_password = generate_password_hash(form.password.data ) #method='sha256'
-
+         #method='sha256'
         
+        hashed_password = generate_password_hash(form.password.data )
         new_user = User(
             name='',
             email=email,
@@ -327,6 +328,7 @@ def admin():
         return redirect(url_for('view_event', event_id=event_id))
     return render_template("adminEvents.html", events=events, form=form)
 
+'''
 #Same route to this page as above? mistake maybe
 @app.route("/admin")
 def admin_dashboard():
@@ -338,6 +340,7 @@ def admin_dashboard():
 def admin_events():
     events = Event.query.all()
     return render_template("adminEvents.html", events=events)
+'''
 
 #this can also be formatted like event_view page showing volunteers instead of notifications
 @app.route("/admin/event/<int:event_id>", methods=['GET', 'POST'])

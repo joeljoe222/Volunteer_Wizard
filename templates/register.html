@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block content %}
 <div class="container">
-    <div class="col-md-4 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
-        <h2>First Time User Registration</h2>
+    <div class="col-lg-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
+        <h2 class="text-center">First Time User Registration</h2>
         <form action="/register" method="POST">
             {{ form.hidden_tag() }}
             <div class="mb-3">
@@ -13,7 +13,7 @@
             <div class="mb-3">
                 {{ form.role.label(class="form-label") }} {{ form.role(class="form-select") }}
             </div>
-            <button type="submit" class="btn btn-primary">Register</button>
+            <button type="submit" class="btn btn-primary w-100">Register</button>
         </form>
     </div>
 </div>
