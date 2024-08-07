@@ -28,19 +28,31 @@
 					<ul class="list-group">
 						{% for notification in notifications %}
 							<li class="list-group-item">
-								<h5>{{ notification.name }}</h5>
+								<div class="d-flex justify-content-between"><h5>{{ notification.name }}</h5>
+									{% if session['role'] == 'admin' %}
+									<div class="btn-group btn-group-sm">
+										<a class="btn btn-outline-primary" href="{{ url_for('notification_manage',event_id=event_id,notification_id=notification.id) }}">Edit</a>
+										<a class="btn btn-outline-danger" href="{{ url_for('notification_delete',event_id=event_id, notification_id=notification.id) }}" onclick="return confirm('Are you sure you want to delete this notification?')">Delete</a>
+									</div>
+									{% endif %}
+								</div>
+								
 								<p>{{ notification.description }}</p>
 							</li>
+							
 						{% endfor %}
 					</ul>
 	
 					{% if session['role'] == 'admin' %}
-					<div class="row py-2">
+					<div class="row pt-2">
+						<div class="col">
+							<a href="{{ url_for('notification_create', event_id=event_id) }}" class="btn btn-primary w-100">Create Notification</a>
+						</div>
 						<div class="col">
 							<a href="{{ url_for('event_manage', event_id=event_id) }}" class="btn btn-primary w-100">Manage Event</a>
 						</div>
 						<div class="col">
-							<a href="{{ url_for('notification_create', event_id=event_id) }}" class="btn btn-primary w-100">Create Notification</a>
+							<a class="btn btn-danger w-100" href="{{ url_for('event_delete',event_id=event_id) }}" onclick="return confirm('Are you sure you want to delete this notification?')">Delete Event</a>
 						</div>
 					</div>
 					{% endif %}
