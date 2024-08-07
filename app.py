@@ -58,8 +58,10 @@ def login():
         
         if user and check_password_hash(user.password, password): #checking based on found User
             role = user.role
+            session['name'] = user.name
             session['email'] = email
             session['role'] = role
+            session['id'] = user.id
             if role == 'volunteer':
                 flash(f"Welcome back, {user.name}!", "success")
 

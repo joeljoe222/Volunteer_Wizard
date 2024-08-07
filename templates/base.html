@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
     <link rel="icon" href="{{ url_for('static', filename='wizIcon.jpg') }}" type="image/x-icon">
-
-
 </head>
 
 <body>
@@ -23,48 +21,41 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{url_for('index')}}">Home</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="{{url_for('about')}}">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('register')}}">Register</a>
+                        <a class="nav-link" href="{{url_for('event_main')}}">Events</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('event_main')}}">Event Page</a>
+                        <a class="nav-link" href="{{url_for('notification_main')}}">Notifications</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('event_create')}}">Create Event</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('notification_main')}}">Notifications Page</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('volunteer')}}">Volunteer Page</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url_for('admin')}}">Admin Page</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('history', volunteer_id=1) }}">Volunteer History</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Log out:{{ session['role'] }}</a>
-                    </li>
-                    <!--
+                    
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</a>
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{% if session['name'] %}{{ session['name'] }}{% elif session['role'] %}{{ session['role'] }}{% else %}User{% endif %}</a>
+                        
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">coming soon</a></li>
-                            <li><a class="dropdown-item" href="#">coming soon</a></li>
+                            {% if session['role'] %}
                             <li>
-                                <hr class="dropdown-divider">
+                                <a class="dropdown-item" href="#">Profile</a>
                             </li>
-                            <li><a class="dropdown-item" href="#">coming soon</a></li>
+                            {% if session['role'] == 'admin'%}
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('admin') }}">Main Admin Page</a>
+                            </li>
+                            {% elif session['role'] == 'volunteer' %}
+                                <a class="dropdown-item" href="{{ url_for('history', volunteer_id=session['id'])}}">{{ session['name'] }} History</a>
+                            {% endif %}
+                            <hr class="dropdown-divider">
+                            <li>
+                                <a class="dropdown-item dropdown-item-danger" href="{{ url_for('logout') }}">{{ session['role'] }} : Log out</a>
+                                {% else %}
+                                <a class="dropdown-item dropdown-item-primary" href="{{ url_for('login') }}">Log in</a>    
+                            </li>
+                            
+                            {% endif %}
                         </ul>
                     </li>
-                -->
+                
                 </ul>
             </div>
         </div>
