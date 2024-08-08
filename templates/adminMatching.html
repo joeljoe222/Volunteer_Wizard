@@ -1,41 +1,36 @@
-{% extends 'base.html' %} {% block content %}
-
+{% extends 'base.html' %}
+{% block content %}
 <div class="container">
-	<div class="col-lg-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
+    <div class="col-lg-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
         <h1 class="text-center">Admin Volunteer Matching</h1>
-		<div class="col py-1 px-2 bg-light rounded">
+        <div class="col py-1 px-2 bg-light rounded">
             <h1 class="text-center">{{ event.name }}</h1>
-            <p>{{ event.description }}</p> 
+            <p>{{ event.description }}</p>
             <p><b>Urgency: </b>{{ event.urgency }}</p>
-            <p><b>Location: </b>{{ event.address }}, {{ event.city }}, {{ event.state.name }}, {{ event.zipcode }}</p> 
-            <p><b>Event Time: </b>{{ event.date.strftime('%Y-%m-%d') }}</p> 
-            
+            <p><b>Location: </b>{{ event.address }}, {{ event.city }}, {{ event.state.name }}, {{ event.zipcode }}</p>
+            <p><b>Event Time: </b>{{ event.date.strftime('%Y-%m-%d') }}</p>
             <b>Required Skills:</b>
             {% for skill in event.skills %}
                 {{ skill.name }}{% if not loop.last %}, {% endif %}
             {% endfor %}
-			</ul>
-		</div>
-
-        <h3 class="text-center p-2">Matched Volunteers</h3>
-            <ul class="list-group">
-                {% for volunteer in volunteers %}
-                <li class="list-group-item">
-                    <h2 class="text-center">{{ volunteer.name }}</h2>
-                    <b>Skills:</b>
-                    {% for skill in volunteer.skills %}
-                        {{ skill.name }}{% if not loop.last %}, {% endif %}
-                    {% endfor %}
-                    <form method="POST" class="d-flex justify-content-center">
-                        {{ form.hidden_tag() }}
-                        {{ form.volunteer_id(value=volunteer.id) }}
-                        {{ form.submit(class="btn btn-primary") }}
-                    </form>
-                </li>
-                {% endfor %}
-            </ul>
         </div>
-	</div>
+        <h3 class="text-center p-2">Matched Volunteers</h3>
+        <ul class="list-group">
+            {% for volunteer in volunteers %}
+            <li class="list-group-item">
+                <h2 class="text-center">{{ volunteer.name }}</h2>
+                <b>Skills:</b>
+                {% for skill in volunteer.skills %}
+                    {{ skill.name }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+                <form method="POST" class="d-flex justify-content-center">
+                    {{ form.hidden_tag() }}
+                    {{ form.volunteer_id(value=volunteer.id) }}
+                    {{ form.submit(class="btn btn-primary") }}
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>
-
 {% endblock %}

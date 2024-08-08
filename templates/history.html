@@ -1,7 +1,7 @@
-{% extends 'base.html' %} {% block content %}
-
+{% extends 'base.html' %}
+{% block content %}
 <div class="container">
-	<div class="col-lg-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
+    <div class="col-lg-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
         <h1 class="text-center">{{ volunteer.name }}'s History</h1>
         <div class="col py-1 px-2 bg-light rounded">
             <b>Skills:</b>
@@ -24,15 +24,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for event in events %}
+                    {% for record in history %}
                     <tr class="text-center">
-                        <td>{{ event.event_name }}</td>
-                        <td>{{ event.event_description }}</td>
-                        <td>{{ event.location }}</td>
-                        <td>{{ event.required_skills }}</td>
-                        <td>{{ event.urgency }}</td>
-                        <td>{{ event.event_date }}</td>
-                        <td>{{ event.participation_status }}</td>
+                        <td>{{ record.event.name }}</td>
+                        <td>{{ record.event.description }}</td>
+                        <td>{{ record.event.address }}, {{ record.event.city }}, {{ record.event.state.name }}, {{ record.event.zipcode }}</td>
+                        <td>
+                            {% for skill in record.event.skills %}
+                                {{ skill.name }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>{{ record.event.urgency }}</td>
+                        <td>{{ record.event.date.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('update_status', record_id=record.id) }}">
+                                {{ form.hidden_tag() }}
+                                <select name="status">
+                                    <option value="In Progress" {% if record.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="Completed" {% if record.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </form>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -40,5 +53,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}

@@ -1,5 +1,5 @@
-{% extends 'base.html' %}{% block content %}
-
+{% extends 'base.html' %}
+{% block content %}
 <div class="container">
     <div class="col-lg-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
         <h1 class="text-center">Select an Event</h1>
@@ -7,12 +7,11 @@
         {% if events %}
             {% for event in events %}
             <li class="list-group-item">
-                <h1><a href="{{ url_for('view_event', event_id=event.id) }}">{{ event.name }}</a></h1>
-                <p>{{ event.description }}</p> 
+                <h1><a href="{{ url_for('admin_match', event_id=event.id) }}">{{ event.name }}</a></h1>
+                <p>{{ event.description }}</p>
                 <p><b>Urgency: </b>{{ event.urgency }}</p>
-                <p><b>Location: </b>{{ event.address }}, {{ event.city }}, {{ event.state.name }}, {{ event.zipcode }}</p> 
-                <p><b>Event Time: </b>{{ event.date.strftime('%Y-%m-%d') }}</p> 
-                
+                <p><b>Location: </b>{{ event.address }}, {{ event.city }}, {{ event.state.name }}, {{ event.zipcode }}</p>
+                <p><b>Event Time: </b>{{ event.date.strftime('%Y-%m-%d') }}</p>
                 <b>Required Skills:</b>
                 {% for skill in event.skills %}
                     {{ skill.name }}{% if not loop.last %}, {% endif %}
@@ -25,5 +24,4 @@
         </ul>
     </div>
 </div>
-
 {% endblock %}
