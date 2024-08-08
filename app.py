@@ -3,6 +3,7 @@ from forms import NotificationForm, EventCreateForm, EventManageForm, RegisterFo
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, VolunteerHistory, Event, Notification, Skill, State
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from functools import wraps
 
 
 app = Flask(__name__)
@@ -145,6 +146,40 @@ def profile(email):
         return redirect(url_for('index'))
    
     return render_template("profile.html", user=user, states=states, skills=skills)
+
+#admin required page management 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            flash('Please log in to access this page.', 'warning')
+            return redirect(url_for('login'))
+        if current_user.role != 'admin':
+            flash('You do not have permission to access this page.', 'danger')
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/manage_users', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def manage_users():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        role = request.form['role']
+        return redirect(url_for('manage_users'))
+    
+    users = User.query.all()
+    return render_template('manage_users.html', users=users)
+
+
+@app.route('/delete_user/<int:user_id>', methods=['POST'])
+def delete_user(user_id):
+    user = User.query.get(user_id)
+    db.session.delete(user)
+    db.session.commit()
+    return redirect(url_for('manage_users'))
 
 
 #Notification System -----------------------------------------------------------
