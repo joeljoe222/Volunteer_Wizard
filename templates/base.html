@@ -29,7 +29,14 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{url_for('notification_main')}}">Notifications</a>
                     </li>
-                    
+                    {% if current_user.is_authenticated and session['role'] == 'admin'%}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('manage_users')}}">Manage</a>
+                    </li>
+                    {% endif %}
+
+
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Account</a>
                         
@@ -43,19 +50,17 @@
                                 <a class="dropdown-item" href="{{ url_for('admin') }}">Main Admin Page</a>
                             </li>
                             {% elif session['role'] == 'volunteer' %}
-                                <a class="dropdown-item" href="{{ url_for('history', volunteer_id=session['id'])}}">{{ session['name'] }} History</a>
-                            {% endif %}
+                            <a class="dropdown-item" href="{{ url_for('history', volunteer_id=session['id'])}}">{{ session['name'] }} History</a> {% endif %}
                             <hr class="dropdown-divider">
                             <li>
-                                <a class="dropdown-item dropdown-item-danger" href="{{ url_for('logout') }}">{{ session['role'] }} : Log out</a>
-                                {% else %}
-                                <a class="dropdown-item dropdown-item-primary" href="{{ url_for('login') }}">Log in</a>    
+                                <a class="dropdown-item dropdown-item-danger" href="{{ url_for('logout') }}">{{ session['role'] }} : Log out</a> {% else %}
+                                <a class="dropdown-item dropdown-item-primary" href="{{ url_for('login') }}">Log in</a>
                             </li>
-                            
+
                             {% endif %}
                         </ul>
                     </li>
-                
+
                 </ul>
             </div>
         </div>

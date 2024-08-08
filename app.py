@@ -1,8 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, make_response
 from forms import NotificationForm, EventCreateForm, EventManageForm, RegisterForm, LoginForm, EventSelectionForm, VolunteerSelectionForm, VolunteerHistoryForm 
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, VolunteerHistory, Event, Notification, Skill, State
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from functools import wraps
+import csv
+from io import BytesIO, StringIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
 
 
 app = Flask(__name__)
@@ -62,8 +68,6 @@ def login():
         email = form.email.data
         password = form.password.data # password recived from form/html.file
         user = User.query.filter_by(email=email).first() # user found based on email
-        
-        
         if user and check_password_hash(user.password, password): #checking based on found User
             login_user(user)
             role = user.role
@@ -73,16 +77,16 @@ def login():
             session['id'] = user.id
             if role == 'volunteer':
                 flash(f"Welcome back, {user.name}!", "success")
-
-                return redirect(url_for('event_main'))
+                return redirect(url_for('volunteer_dashboard', volunteer_id=user.id))
             elif role == 'admin':
                 return redirect(url_for('admin', email=email))
             else:
                 flash("Role not refined, re-register user before trying to sign in", "danger")
         else:
             flash("Invalid email or password.", "danger")
-    
     return render_template("login.html", form=form)
+
+
 
 
 #Register Page
@@ -145,6 +149,40 @@ def profile(email):
         return redirect(url_for('index'))
    
     return render_template("profile.html", user=user, states=states, skills=skills)
+
+#admin required page management 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            flash('Please log in to access this page.', 'warning')
+            return redirect(url_for('login'))
+        if current_user.role != 'admin':
+            flash('You do not have permission to access this page.', 'danger')
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/manage_users', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def manage_users():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        role = request.form['role']
+        return redirect(url_for('manage_users'))
+    
+    users = User.query.all()
+    return render_template('manage_users.html', users=users)
+
+
+@app.route('/delete_user/<int:user_id>', methods=['POST'])
+def delete_user(user_id):
+    user = User.query.get(user_id)
+    db.session.delete(user)
+    db.session.commit()
+    return redirect(url_for('manage_users'))
 
 
 #Notification System -----------------------------------------------------------
@@ -329,128 +367,139 @@ def event_delete(event_id):
 
 #Comment what wach route is
 
-#Admin page
-#You can use events page to format this page to show all events
+# Admin page to view all events and assign volunteers
 @app.route("/admin")
+@login_required
+@admin_required
 def admin():
-    form = EventSelectionForm()
-    events = Event.query.all()  # Fetching all events from the database
-    if form.validate_on_submit():
-        event_id = form.event_id.data
-        return redirect(url_for('view_event', event_id=event_id))
-    return render_template("adminEvents.html", events=events, form=form)
-
-'''
-#Same route to this page as above? mistake maybe
-@app.route("/admin")
-def admin_dashboard():
     events = Event.query.all()
     return render_template("adminEvents.html", events=events)
 
-#Undefined error and how would one get to this page normally?
-@app.route("/admin/events")
-def admin_events():
-    events = Event.query.all()
-    return render_template("adminEvents.html", events=events)
-'''
-
-#this can also be formatted like event_view page showing volunteers instead of notifications
+# Admin page to match volunteers to a specific event
 @app.route("/admin/event/<int:event_id>", methods=['GET', 'POST'])
+@login_required
+@admin_required
 def admin_match(event_id):
     event = Event.query.get_or_404(event_id)
-    volunteers = User.query.filter_by(role='volunteer').all()  # Fetch volunteers
+    volunteers = User.query.filter_by(role='volunteer').all()
     form = VolunteerSelectionForm()
 
     if form.validate_on_submit():
         volunteer_id = form.volunteer_id.data
-        volunteer = User.query.get(volunteer_id)
-        if volunteer:
-            history = VolunteerHistory(volunteer_id=volunteer.id, event_id=event.id, status='Assigned')
-            db.session.add(history)
-            db.session.commit()
-            flash(f'Volunteer {volunteer.name} assigned to event {event.name}!', 'success')
-            return redirect(url_for('admin_match', event_id=event.id))
+        history = VolunteerHistory(volunteer_id=volunteer_id, event_id=event_id, status='In Progress')
+        db.session.add(history)
+        db.session.commit()
+        flash('Volunteer assigned to event!', 'success')
+        return redirect(url_for('admin_match', event_id=event_id))
 
     return render_template("adminMatching.html", event=event, volunteers=volunteers, form=form)
 
-#Missing Label
-#Same route as above?
-@app.route("/admin/event/<int:event_id>", methods=['GET', 'POST'])
-def view_event(event_id):
-    events = Event.query.all()
-    volunteers = User.query.filter_by(role='volunteer').all()
-    form = VolunteerSelectionForm()
-    selected_event = next((event for event in events if event['id'] == event_id), None)
-    matches = match_volunteers_to_events(volunteers, events)
-    matched_volunteers = [match[0] for match in matches if match[1] == selected_event]
-    success_message = None
-
-    if form.validate_on_submit():
-        volunteer_id = form.volunteer_id.data
-        selected_volunteer = next((v for v in volunteers if str(v['id']) == volunteer_id), None)
-        success_message = f'Successfully matched volunteer: {selected_volunteer["name"]} for the event: {selected_event["event_name"]}'
-
-    return render_template("adminMatching.html", event=selected_event, volunteers=matched_volunteers, form=form, success_message=success_message)
-
-#Volunteer Page
-#good job on the flash btw
-#Unfinished
-@app.route("/volunteer", methods=['GET', 'POST'])
-def volunteer():
-    form = EventSelectionForm()
-    volunteers = User.query.filter_by(role=1).all()  # Fetching all volunteers with role 'volunteer'
-    
-    # Check if volunteers list is empty
-    if not volunteers:
-        flash("No volunteers found.", "warning")
-        return render_template("volunteerMatching.html", volunteer=None, events=[], form=form)
-
-    volunteer = volunteers[0]  # Simulating fetching the first volunteer
-    events = Event.query.all()  # Fetching all events
-    matched_events = []  # Replace with logic to get matched events if applicable
-
-    if form.validate_on_submit():
-        event_id = form.event_id.data
-        selected_event = Event.query.get(event_id)
-        success_message = f'Successfully matched with event: {selected_event.name}'
-        return render_template("volunteerMatching.html", volunteer=volunteer, events=matched_events, form=form, success_message=success_message)
-
-    return render_template("volunteerMatching.html", volunteer=volunteer, events=matched_events, form=form)
-
-#volunteer dashboard
-#Will you also display volunteer history here?
+# Volunteer dashboard to view assigned events
 @app.route("/volunteer/<int:volunteer_id>")
+@login_required
 def volunteer_dashboard(volunteer_id):
     volunteer = User.query.get_or_404(volunteer_id)
     history = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
-    events = [h.event for h in history if h.event]  # List of events the volunteer is assigned to
+    events = [h.event for h in history if h.event]
     return render_template("volunteerMatching.html", volunteer=volunteer, events=events)
 
-#Volunteer's history page
-#Can this just be displayed in route above? or will above site displayed only recent events and this show full history?
+# Volunteer's history page to show event participation status
 @app.route("/history/<int:volunteer_id>")
+@login_required
 def history(volunteer_id):
     volunteer = User.query.get_or_404(volunteer_id)
-    history = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
-    return render_template("history.html", volunteer=volunteer, history=history)
+    history_records = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
+    return render_template("history.html", volunteer=volunteer, history=history_records)
 
-#no template found
-#What would this page do? like an admin would confirm a volunteers participation in an event?
-@app.route('/history/add', methods=['GET', 'POST'])
-def add_history():
-    form = VolunteerHistoryForm()
-    if form.validate_on_submit():
-        history_record = VolunteerHistory(
-            volunteer_id=form.volunteer_id.data,
-            event_id=form.event_id.data,
-            participation_date=form.participation_date.data,
-            status=form.status.data
-        )
-        db.session.add(history_record)
-        db.session.commit()
-        flash('Volunteer history added successfully!', 'success')
-        return redirect(url_for('history', volunteer_id=form.volunteer_id.data))
-    return render_template('add_history.html', form=form)
+# Route to update volunteer participation status
+@app.route("/history/update_status/<int:record_id>", methods=['POST'])
+@login_required
+def update_status(record_id):
+    history_record = VolunteerHistory.query.get_or_404(record_id)
+    if history_record.volunteer_id != current_user.id:
+        flash('You do not have permission to update this record.', 'danger')
+        return redirect(url_for('history', volunteer_id=current_user.id))
+
+    history_record.status = request.form.get('status', 'In Progress')
+    db.session.commit()
+    flash('Participation status updated!', 'success')
+    return redirect(url_for('history', volunteer_id=current_user.id))
+
+# Route to view volunteer history (for admin)
+@app.route('/admin/volunteer_history/<int:volunteer_id>')
+@login_required
+@admin_required
+def admin_volunteer_history(volunteer_id):
+    volunteer = User.query.get_or_404(volunteer_id)
+    history_records = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
+    return render_template("admin_volunteer_history.html", volunteer=volunteer, history=history_records)
+
+# Route to display the admin reports page
+@app.route('/admin/reports')
+@login_required
+@admin_required
+def admin_reports():
+    return render_template('adminReports.html')
+
+# Route to generate volunteer participation history report in CSV
+@app.route('/reports/volunteer_history/csv/<int:volunteer_id>', methods=['GET'])
+@login_required
+@admin_required
+def volunteer_history_csv(volunteer_id):
+    volunteer = User.query.get_or_404(volunteer_id)
+    history = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
+    si = StringIO()
+    cw = csv.writer(si)
+    cw.writerow(['Volunteer Name', 'Event Name', 'Event Description', 'Participation Date', 'Status'])
+
+    for record in history:
+        event = Event.query.get(record.event_id)
+        cw.writerow([volunteer.name, event.name, event.description, record.participation_date, record.status])
+
+    output = make_response(si.getvalue())
+    output.headers["Content-Disposition"] = f"attachment; filename={volunteer.name}_history.csv"
+    output.headers["Content-type"] = "text/csv"
+    return output
+
+# Route to generate volunteer participation history report in PDF
+@app.route('/reports/volunteer_history/pdf/<int:volunteer_id>', methods=['GET'])
+@login_required
+@admin_required
+def volunteer_history_pdf(volunteer_id):
+    volunteer = User.query.get_or_404(volunteer_id)
+    history = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    p.setFont("Helvetica", 12)
+    p.drawString(100, height - 40, f"{volunteer.name}'s Participation History Report")
+
+    y = height - 80
+    for record in history:
+        event = Event.query.get(record.event_id)
+        p.drawString(50, y, "Event Name")
+        p.drawString(200, y, "Event Description")
+        p.drawString(350, y, "Participation Date")
+        p.drawString(450, y, "Status")
+        y -= 20
+        p.drawString(50, y, event.name)
+        p.drawString(200, y, event.description)
+        p.drawString(350, y, record.participation_date.strftime("%Y-%m-%d %H:%M:%S"))
+        p.drawString(450, y, record.status)
+        y -= 20
+        if y < 100:
+            p.showPage()
+            p.setFont("Helvetica", 12)
+            y = height - 40
+
+    p.save()
+    buffer.seek(0)
+    response = make_response(buffer.getvalue())
+    response.headers['Content-Disposition'] = f'attachment; filename={volunteer.name}_history.pdf'
+    response.headers['Content-Type'] = 'application/pdf'
+    return response
+
 #End of pages ==================================================================
 
 
