@@ -49,6 +49,9 @@
                             <li>
                                 <a class="dropdown-item" href="{{ url_for('admin') }}">Main Admin Page</a>
                             </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('event_create') }}">Create New Event</a>
+                            </li>
                             {% elif session['role'] == 'volunteer' %}
                             <a class="dropdown-item" href="{{ url_for('history', volunteer_id=session['id'])}}">{{ session['name'] }} History</a> {% endif %}
                             <hr class="dropdown-divider">

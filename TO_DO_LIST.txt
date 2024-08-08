@@ -41,7 +41,6 @@ Joels things to get done
 Priority:
 
 Later:
-	-add profile page so users can update thier profiles
 	-make sure each page can load when database is empty
 	-make events show if its showing matched events or not
 	-create event button for admins

@@ -23,11 +23,14 @@
                 {% for skill in volunteer.skills %}
                     {{ skill.name }}{% if not loop.last %}, {% endif %}
                 {% endfor %}
-                <form method="POST" class="d-flex justify-content-center">
+                <div class="d-flex justify-content-between">
+                <form method="POST" class="">
                     {{ form.hidden_tag() }}
                     {{ form.volunteer_id(value=volunteer.id) }}
                     {{ form.submit(class="btn btn-primary") }}
                 </form>
+                <a class="btn btn-secondary" href="{{ url_for('history',volunteer_id=volunteer.id) }}">View Volunteer History</a>
+                </div>
             </li>
             {% endfor %}
         </ul>

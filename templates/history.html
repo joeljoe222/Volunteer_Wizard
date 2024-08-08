@@ -24,24 +24,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for record in history %}
+                    {% for event in history %}
                     <tr class="text-center">
-                        <td>{{ record.event.name }}</td>
-                        <td>{{ record.event.description }}</td>
-                        <td>{{ record.event.address }}, {{ record.event.city }}, {{ record.event.state.name }}, {{ record.event.zipcode }}</td>
+                        <td>{{ event.name }}</td>
+                        <td>{{ event.description }}</td>
+                        <td>{{ event.address }}, {{ event.city }}, {{ event.state }}, {{ event.zipcode }}</td>
                         <td>
-                            {% for skill in record.event.skills %}
+                            {% for skill in event.skills %}
                                 {{ skill.name }}{% if not loop.last %}, {% endif %}
                             {% endfor %}
                         </td>
-                        <td>{{ record.event.urgency }}</td>
-                        <td>{{ record.event.date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ event.urgency }}</td>
+                        <td>{{ event.date }}</td>
                         <td>
-                            <form method="POST" action="{{ url_for('update_status', record_id=record.id) }}">
-                                {{ form.hidden_tag() }}
+                            <form method="POST" action="{{ url_for('update_status', record_id=event.id) }}">
+                                
                                 <select name="status">
-                                    <option value="In Progress" {% if record.status == 'In Progress' %}selected{% endif %}>In Progress</option>
-                                    <option value="Completed" {% if record.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                    <option value="In Progress" >{% if status == 'In Progress' %}selected{% endif %}In Progress</option>
+                                    <option value="Completed" >{% if status == 'Completed' %}selected{% endif %}Completed</option>
                                 </select>
                                 <button type="submit" class="btn btn-primary">Update</button>
                             </form>
