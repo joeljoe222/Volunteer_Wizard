@@ -55,8 +55,9 @@ class VolunteerHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     volunteer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
-    participation_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     status = db.Column(db.String(50), nullable=False)
+    participation_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    event = db.relationship('Event', backref=db.backref('volunteer_histories', lazy=True))
 
     def __repr__(self):
         return f'<VolunteerHistory {self.volunteer_id}-{self.event_id}>'
