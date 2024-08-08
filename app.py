@@ -66,18 +66,27 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         email = form.email.data
-        password = form.password.data
-        user = User.query.filter_by(email=email).first()
-        if user and check_password_hash(user.password, password):
+        password = form.password.data # password recived from form/html.file
+        user = User.query.filter_by(email=email).first() # user found based on email
+        if user and check_password_hash(user.password, password): #checking based on found User
             login_user(user)
-            next_page = request.args.get('next')
-            if user.role == 'admin':
-                return redirect(next_page or url_for('admin'))
-            elif user.role == 'volunteer':
-                return redirect(next_page or url_for('volunteer_dashboard', volunteer_id=user.id))
+            role = user.role
+            session['name'] = user.name
+            session['email'] = email
+            session['role'] = role
+            session['id'] = user.id
+            if role == 'volunteer':
+                flash(f"Welcome back, {user.name}!", "success")
+                return redirect(url_for('volunteer_dashboard', volunteer_id=user.id))
+            elif role == 'admin':
+                return redirect(url_for('admin', email=email))
+            else:
+                flash("Role not refined, re-register user before trying to sign in", "danger")
         else:
             flash("Invalid email or password.", "danger")
     return render_template("login.html", form=form)
+
+
 
 
 #Register Page
