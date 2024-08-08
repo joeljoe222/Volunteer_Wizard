@@ -1,9 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, make_response
 from forms import NotificationForm, EventCreateForm, EventManageForm, RegisterForm, LoginForm, EventSelectionForm, VolunteerSelectionForm, VolunteerHistoryForm 
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, VolunteerHistory, Event, Notification, Skill, State
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from functools import wraps
+import csv
+from io import BytesIO, StringIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
 
 
 app = Flask(__name__)
@@ -61,28 +66,17 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         email = form.email.data
-        password = form.password.data # password recived from form/html.file
-        user = User.query.filter_by(email=email).first() # user found based on email
-        
-        
-        if user and check_password_hash(user.password, password): #checking based on found User
+        password = form.password.data
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
             login_user(user)
-            role = user.role
-            session['name'] = user.name
-            session['email'] = email
-            session['role'] = role
-            session['id'] = user.id
-            if role == 'volunteer':
-                flash(f"Welcome back, {user.name}!", "success")
-
-                return redirect(url_for('event_main'))
-            elif role == 'admin':
-                return redirect(url_for('admin', email=email))
-            else:
-                flash("Role not refined, re-register user before trying to sign in", "danger")
+            next_page = request.args.get('next')
+            if user.role == 'admin':
+                return redirect(next_page or url_for('admin'))
+            elif user.role == 'volunteer':
+                return redirect(next_page or url_for('volunteer_dashboard', volunteer_id=user.id))
         else:
             flash("Invalid email or password.", "danger")
-    
     return render_template("login.html", form=form)
 
 
@@ -421,6 +415,81 @@ def update_status(record_id):
     db.session.commit()
     flash('Participation status updated!', 'success')
     return redirect(url_for('history', volunteer_id=current_user.id))
+
+# Route to view volunteer history (for admin)
+@app.route('/admin/volunteer_history/<int:volunteer_id>')
+@login_required
+@admin_required
+def admin_volunteer_history(volunteer_id):
+    volunteer = User.query.get_or_404(volunteer_id)
+    history_records = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
+    return render_template("admin_volunteer_history.html", volunteer=volunteer, history=history_records)
+
+# Route to display the admin reports page
+@app.route('/admin/reports')
+@login_required
+@admin_required
+def admin_reports():
+    return render_template('adminReports.html')
+
+# Route to generate volunteer participation history report in CSV
+@app.route('/reports/volunteer_history/csv/<int:volunteer_id>', methods=['GET'])
+@login_required
+@admin_required
+def volunteer_history_csv(volunteer_id):
+    volunteer = User.query.get_or_404(volunteer_id)
+    history = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
+    si = StringIO()
+    cw = csv.writer(si)
+    cw.writerow(['Volunteer Name', 'Event Name', 'Event Description', 'Participation Date', 'Status'])
+
+    for record in history:
+        event = Event.query.get(record.event_id)
+        cw.writerow([volunteer.name, event.name, event.description, record.participation_date, record.status])
+
+    output = make_response(si.getvalue())
+    output.headers["Content-Disposition"] = f"attachment; filename={volunteer.name}_history.csv"
+    output.headers["Content-type"] = "text/csv"
+    return output
+
+# Route to generate volunteer participation history report in PDF
+@app.route('/reports/volunteer_history/pdf/<int:volunteer_id>', methods=['GET'])
+@login_required
+@admin_required
+def volunteer_history_pdf(volunteer_id):
+    volunteer = User.query.get_or_404(volunteer_id)
+    history = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    p.setFont("Helvetica", 12)
+    p.drawString(100, height - 40, f"{volunteer.name}'s Participation History Report")
+
+    y = height - 80
+    for record in history:
+        event = Event.query.get(record.event_id)
+        p.drawString(50, y, "Event Name")
+        p.drawString(200, y, "Event Description")
+        p.drawString(350, y, "Participation Date")
+        p.drawString(450, y, "Status")
+        y -= 20
+        p.drawString(50, y, event.name)
+        p.drawString(200, y, event.description)
+        p.drawString(350, y, record.participation_date.strftime("%Y-%m-%d %H:%M:%S"))
+        p.drawString(450, y, record.status)
+        y -= 20
+        if y < 100:
+            p.showPage()
+            p.setFont("Helvetica", 12)
+            y = height - 40
+
+    p.save()
+    buffer.seek(0)
+    response = make_response(buffer.getvalue())
+    response.headers['Content-Disposition'] = f'attachment; filename={volunteer.name}_history.pdf'
+    response.headers['Content-Type'] = 'application/pdf'
+    return response
 
 #End of pages ==================================================================
 

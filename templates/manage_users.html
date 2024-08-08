@@ -1,5 +1,5 @@
-{% extends 'base.html' %} {% block content %}
-
+{% extends 'base.html' %} 
+{% block content %}
 
 <body>
     <h1>Users List</h1>
@@ -11,11 +11,13 @@
                 <th>Name</th>
                 <th>Email</th>
                 <th>Role</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for user in users %}
             <tr>
+                <td>{{ user.id }}</td>
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.role }}</td>
@@ -23,6 +25,11 @@
                     <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
                         <button type="submit">Delete</button>
                     </form>
+                    {% if user.role == 'volunteer' %}
+                    <form action="{{ url_for('admin_volunteer_history', volunteer_id=user.id) }}" method="GET" style="display:inline;">
+                        <button type="submit">View History</button>
+                    </form>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

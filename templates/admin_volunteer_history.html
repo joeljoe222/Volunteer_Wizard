@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h1 class="text-center">{{ volunteer.name }}'s History</h1>
+    <div class="text-center">
+        <a href="{{ url_for('volunteer_history_csv', volunteer_id=volunteer.id) }}" class="btn btn-primary">Download CSV</a>
+        <a href="{{ url_for('volunteer_history_pdf', volunteer_id=volunteer.id) }}" class="btn btn-primary">Download PDF</a>
+    </div>
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>Event Name</th>
+                <th>Event Description</th>
+                <th>Participation Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in history %}
+            <tr>
+                <td>{{ record.event.name }}</td>
+                <td>{{ record.event.description }}</td>
+                <td>{{ record.participation_date }}</td>
+                <td>{{ record.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
