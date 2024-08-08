@@ -31,7 +31,7 @@
                     </li>
                     
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{% if session['name'] %}{{ session['name'] }}{% elif session['role'] %}{{ session['role'] }}{% else %}User{% endif %}</a>
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Account</a>
                         
                         <ul class="dropdown-menu">
                             {% if current_user.is_authenticated %}
