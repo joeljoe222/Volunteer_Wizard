@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container mt-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    
     <div class="col-lg-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
         <h1 class="text-center">Admin Volunteer Matching</h1>
         <div class="col py-1 px-2 bg-light rounded">
