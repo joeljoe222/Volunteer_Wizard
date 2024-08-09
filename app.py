@@ -11,6 +11,7 @@ from reportlab.pdfgen import canvas
 from flask_mail import Mail, Message
 
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0b\xb9\xa5\xb6\xd7.\xc3'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
@@ -35,6 +36,8 @@ def load_user(user_id):
 #All Pages =====================================================================
 
 #Main index page
+#Add register button
+#Exception thrown when submit
 @app.route("/")
 def index():
     form = LoginForm()   
@@ -402,16 +405,24 @@ def admin_match(event_id):
     volunteers = User.query.filter_by(role='volunteer').all()
     form = VolunteerSelectionForm()
 
-    if form.is_submitted(): 
+    if form.validate_on_submit():
         volunteer_id = form.volunteer_id.data
-        history = VolunteerHistory(volunteer_id=volunteer_id, event_id=event_id, status='In Progress')
-        db.session.add(history)
-        db.session.commit()
-        flash('Volunteer assigned to event!', 'success')
+        volunteer = User.query.get(volunteer_id)
+        
+        # Check if the volunteer is already assigned to this event
+        existing_history = VolunteerHistory.query.filter_by(volunteer_id=volunteer_id, event_id=event_id).first()
+        
+        if not existing_history:
+            history = VolunteerHistory(volunteer_id=volunteer_id, event_id=event_id, status='Assigned')
+            db.session.add(history)
+            db.session.commit()
+            flash(f'Volunteer {volunteer.name} assigned to event {event.name}!', 'success')
+        else:
+            flash(f'Volunteer {volunteer.name} is already assigned to this event.', 'warning')
+        
         return redirect(url_for('admin_match', event_id=event_id))
 
     return render_template("adminMatching.html", event=event, volunteers=volunteers, form=form)
-
 
 # Volunteer dashboard to view assigned events
 @app.route("/volunteer/<int:volunteer_id>")
@@ -419,7 +430,8 @@ def admin_match(event_id):
 def volunteer_dashboard(volunteer_id):
     volunteer = User.query.get_or_404(volunteer_id)
     history = VolunteerHistory.query.filter_by(volunteer_id=volunteer.id).all()
-    events = [h.event for h in history if h.event]
+    events = [h.event for h in history if h.status in ['Assigned', 'In Progress', 'Completed']]
+    
     return render_template("volunteerMatching.html", volunteer=volunteer, events=events)
 
 # Volunteer's history page to show event participation status
