@@ -402,7 +402,7 @@ def admin_match(event_id):
     volunteers = User.query.filter_by(role='volunteer').all()
     form = VolunteerSelectionForm()
 
-    if form.validate_on_submit():
+    if form.is_submitted(): 
         volunteer_id = form.volunteer_id.data
         history = VolunteerHistory(volunteer_id=volunteer_id, event_id=event_id, status='In Progress')
         db.session.add(history)
@@ -411,6 +411,7 @@ def admin_match(event_id):
         return redirect(url_for('admin_match', event_id=event_id))
 
     return render_template("adminMatching.html", event=event, volunteers=volunteers, form=form)
+
 
 # Volunteer dashboard to view assigned events
 @app.route("/volunteer/<int:volunteer_id>")
