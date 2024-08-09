@@ -5,7 +5,6 @@ DB_ClearAll		: Clears All Databases || Clear Databases if there are issues with 
 DB_ClearAll_AddSample	: Reinitializes Databases with Sample Databases || Good practice is to run this before Debugging
 ================================================================================
 
-
 ================================================================================
 	Everyone : Good Practices while working
 
@@ -24,16 +23,9 @@ DB_ClearAll_AddSample	: Reinitializes Databases with Sample Databases || Good pr
        	change URLs to use dashes event-main, event-create
 ================================================================================
 
-
 ================================================================================
 Joels things to get done
-1. Create database
-2. store login details in DB
-3. store profile info in DB
-4. Access DB for authentication
-5. Manage Access volunteer vs ADMIN
 ================================================================================
-
 
 ================================================================================
 	Jay : Event, Notification
@@ -48,70 +40,103 @@ Later:
 	-make matching skills green in admin matching
 ================================================================================
 
+================================================================================
+Problem Statement
 
+A non-profit organization has requested to build a software application that will help manage and optimize their volunteer activities. The application should help the organization efficiently allocate volunteers to different events and tasks based on their preferences, skills, and availability. The application should consider the following criteria:
+
++ Volunteer’s location
++ Volunteer’s skills and preferences
++ Volunteer’s availability
++ Event requirements and location
++ Task urgency and priority
+
+The software must include the following components:
+
+	- Login (Allow volunteers and administrators to register if not already registered)
+	
+	- User Registration (Initially only username and password, followed by email verification)
+	
+	- User Profile Management (After registration, users should log in to complete their profile, including location, skills, preferences, and availability)
+	
+	- Event Management (Administrators can create and manage events, specifying required skills, location, and urgency)
+	
+	- Volunteer Matching (A module that matches volunteers to events/tasks based on their profiles and the event requirements)
+	
+	- Notification System (Send notifications to volunteers for event assignments, updates, and reminders)
+	
+	- Volunteer History (Track volunteer participation history and performance)
 ================================================================================
 Assignment 2 : Front-End
 
--Login (Allow volunteers and administrators to register if not registered yet)
+- Login (Allow volunteers and administrators to register if not registered yet)
 
--User Registration (Initially only username (use email) and password)
+- User Registration (Initially only username (use email) and password)
 
--User Profile Management (After registration, users should log in first to complete their profile). Following fields will be on the profile page/form:
-	+Full Name (50 characters, required)
-	+Address 1 (100 characters, required)
-	+Address 2 (100 characters, optional)
-	+City (100 characters, required)
-	+State (Drop Down, selection required) DB will store 2-character state code
-	+Zip code (9 characters, at least 5-character code required)
-	+Skills (multi-select dropdown, required)
-	+Preferences (Text area, optional)
-	+Availability (Date picker, multiple dates allowed, required)
+- User Profile Management (After registration, users should log in first to complete their profile). Following fields will be on the profile page/form:
+	+ Full Name (50 characters, required)
+	+ Address 1 (100 characters, required)
+	+ Address 2 (100 characters, optional)
+	+ City (100 characters, required)
+	+ State (Drop Down, selection required) DB will store 2-character state code
+	+ Zip code (9 characters, at least 5-character code required)
+	+ Skills (multi-select dropdown, required)
+	+ Preferences (Text area, optional)
+	+ Availability (Date picker, multiple dates allowed, required)
 
--Event Management Form (Administrators can create and manage events). The form should include:
-	+Event Name (100 characters, required)
-	+Event Description (Text area, required)
-	+Location (Text area, required)
-	+Required Skills (Multi-select dropdown, required)
-	+Urgency (Drop down, selection required)
-	+Event Date (Calendar, date picker)
+- Event Management Form (Administrators can create and manage events). The form should include:
+	+ Event Name (100 characters, required)
+	+ Event Description (Text area, required)
+	+ Location (Text area, required)
+	+ Required Skills (Multi-select dropdown, required)
+	+ Urgency (Drop down, selection required)
+	+ Event Date (Calendar, date picker)
 
--Volunteer Matching Form (A form where administrators can view and match volunteers to events based on their profiles and event requirements):
-	+Volunteer Name (Auto-fill from database)
-	+Matched Event (Auto-fill from database based on volunteer's profile)
+- Volunteer Matching Form (A form where administrators can view and match volunteers to events based on their profiles and event requirements):
+	+ Volunteer Name (Auto-fill from database)
+	+ Matched Event (Auto-fill from database based on volunteer's profile)
 
--Notification System
-	+Display notifications for new event assignments, updates, and reminders
+- Notification System
+	+ Display notifications for new event assignments, updates, and reminders
 
--Volunteer History
-	+Tabular display of all volunteer participation history. All fields from Event Management are displayed, along with volunteer’s participation status.
+- Volunteer History
+	+ Tabular display of all volunteer participation history. All fields from Event Management are displayed, along with volunteer’s participation status.
 
 !! You should have validations in place for required fields, field types, and field lengths. !!
 ================================================================================
 Assignment 3 : Back-End
 
--Login Module: Handle user authentication, registration, and login functionality.
+- Login Module: Handle user authentication, registration, and login functionality.
 
--User Profile Management Module: Manage user profile data, including location, skills, preferences, and availability.
+- User Profile Management Module: Manage user profile data, including location, skills, preferences, and availability.
 
--Event Management Module: Create and manage events, including required skills, location, urgency, and event details.
+- Event Management Module: Create and manage events, including required skills, location, urgency, and event details.
 
--Volunteer Matching Module: Implement logic to match volunteers to events based on their profiles and event requirements.
+- Volunteer Matching Module: Implement logic to match volunteers to events based on their profiles and event requirements.
 
--Notification Module: Logic to send notifications to volunteers for event assignments, updates, and reminders.
+- Notification Module: Logic to send notifications to volunteers for event assignments, updates, and reminders.
 
--Volunteer History Module: Track and display volunteer participation history.
+- Volunteer History Module: Track and display volunteer participation history.
 
--Pricing Module: Only create a class. You will implement this in the last assignment.
+- Pricing Module: Only create a class. You will implement this in the last assignment.
 ================================================================================
 Assignment 4 : Databases
 
--UserCredentials: (ID & password), password should be encrypted.
+- UserCredentials: (ID & password), password should be encrypted.
 
--UserProfile: Stores user details like full name, address, city, state, zipcode, skills, preferences, and availability.
+- UserProfile: Stores user details like full name, address, city, state, zipcode, skills, preferences, and availability.
 
--EventDetails: Stores details of the events such as event name, description, location, required skills, urgency, and event date.
+- EventDetails: Stores details of the events such as event name, description, location, required skills, urgency, and event date.
 
--VolunteerHistory: Tracks volunteer participation in events.
+- VolunteerHistory: Tracks volunteer participation in events.
 
--States: Stores state codes and names (if required).
+- States: Stores state codes and names (if required).
+================================================================================
+Assignment 5 : Complete Project
+
+- Create a reporting module that allows administrators to generate reports on volunteer activities and event management.
+- The reports should include the following:
+	+List of volunteers and their participation history.
+	+Event details and volunteer assignments.
+- Provide options to generate reports in different formats (e.g., PDF, CSV).
 ================================================================================

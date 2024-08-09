@@ -10,7 +10,6 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0b\xb9\xa5\xb6\xd7.\xc3'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
@@ -26,8 +25,6 @@ def load_user(user_id):
 #All Pages =====================================================================
 
 #Main index page
-#Add register button
-#Exception thrown when submit
 @app.route("/")
 def index():
     form = LoginForm()   

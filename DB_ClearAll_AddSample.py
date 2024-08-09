@@ -196,40 +196,40 @@ with app.app_context():
     #Create sample events
     events = [
         {
-            'name': 'Event One',
-            'description': 'Description for Event One',
+            'name': 'Comminity CleanUp',
+            'description': 'Join us for a day of cleaning and beautifying Central Park. Volunteers will work in teams to pick up litter, plant flowers, and improve the parks environment for everyone to enjoy.',
             'date': datetime(2025, 1, 1),
-            'urgency': '1',
-            'address': '1111 Street Name',
-            'city': 'city',
-            'state_id': 1,
-            'zipcode': '11111',
+            'urgency': '3',
+            'address': '1234 Main St',
+            'city': 'Houston',
+            'state_id': 43,
+            'zipcode': '77035',
             'user_id': 1,
-            'skills':[1,2,3,4,5]
+            'skills':[1,2,3,14]
         },
         {
-            'name': 'Event Two',
-            'description': 'Description for Event Two',
+            'name': 'Food Bank Assistance',
+            'description': 'Help organize and distribute food to those in need at the Downtown Center. Volunteers will sort donations, prepare packages, and assist with distribution, ensuring a smooth operation.',
             'date': datetime(2025, 2, 2),
             'urgency': '2',
-            'address': '2222 Street Name',
-            'city': 'city222',
-            'state_id': 2,
-            'zipcode': '22222',
+            'address': '2475 Lane Dr',
+            'city': 'Miami',
+            'state_id': 9,
+            'zipcode': '35077',
             'user_id': 1,
-            'skills':[6,7,8,9,10]
+            'skills':[2,7,14]
         },
         {
-            'name': 'Event Three',
-            'description': 'Description for Event Three',
+            'name': 'Art Class for Seniors',
+            'description': 'Facilitate an art class for seniors at the community hall. Volunteers will assist with art projects, encourage creativity, and provide a supportive and enjoyable environment for participants.',
             'date': datetime(2025, 3, 3),
-            'urgency': '3',
-            'address': '3333 Street Name',
-            'city': 'city',
-            'state_id': 3,
-            'zipcode': '11111',
+            'urgency': '1',
+            'address': '2468 Street Ln',
+            'city': 'Asheville',
+            'state_id': 33,
+            'zipcode': '88465',
             'user_id': 1,
-            'skills':[11,12,13,14,15]
+            'skills':[4,6,7,9,10]
         }
     ]
 
@@ -252,35 +252,28 @@ with app.app_context():
     print('Sample Events Created')
 
     #Create sample notifications for each event
-    event_one = Event.query.filter_by(name='Event One').first()
-    event_two = Event.query.filter_by(name='Event Two').first()
 
     notifications = [
         {
-            'name': 'Notification ONE for Event ONE',
-            'description': 'Notification ONE Description for Event ONE',
-            'event_id': event_one.id
+            'name': 'Community Cleanup Event Tomorrow!',
+            'description': 'Just a reminder that our Community Cleanup event is happening tomorrow at Central Park! We’ll be meeting at the park entrance at 9:00 AM. Please wear comfortable clothes and sturdy shoes. All cleanup materials will be provided. We look forward to seeing you there and making a positive impact on our community!',
+            'event_id': 1
         },
         {
-            'name': 'Notification TWO for Event ONE',
-            'description': 'Notification TWO Description for Event ONE',
-            'event_id': event_one.id
+            'name': 'Weather Update for Community Cleanup',
+            'description': 'We wanted to let you know that the weather forecast for tomorrow is sunny and warm. Be sure to bring sunscreen, a hat, and plenty of water to stay hydrated during the Community Cleanup. Let’s enjoy the beautiful weather while we work!',
+            'event_id': 1
         },
         {
-            'name': 'Notification ONE for Event TWO',
-            'description': 'Notification ONE Description for Event TWO',
-            'event_id': event_two.id
+            'name': 'Important Details for Todays Food Bank Assistance',
+            'description': 'Today is the day! We are excited to have you join us for the Food Bank Assistance event. Please arrive at the Downtown Center by 9:45 AM to check in and receive your assignments. Parking is available in the lot behind the building. Remember to wear comfortable clothing and closed-toe shoes. We will provide gloves and aprons for food handling.',
+            'event_id': 2
         },
         {
-            'name': 'Notification TWO for Event TWO',
-            'description': 'Notification TWO Description for Event TWO',
-            'event_id': event_two.id
+            'name': 'Art Class for Seniors: Event Day Instructions',
+            'description': 'Today is the day for our Art Class for Seniors! Please arrive at the Community Hall by 1:30 PM to help set up art materials and welcome participants. Wear comfortable clothing, as we might get a little messy while creating art! Your role is to assist the seniors with their projects, provide encouragement, and ensure they have a fun and rewarding experience.',
+            'event_id': 3
         },
-        {
-            'name': 'Notification THREE for Event TWO',
-            'description': 'Notification THREE Description for Event TWO',
-            'event_id': event_two.id
-        }
     ]
 
     for notification_data in notifications:
@@ -292,19 +285,17 @@ with app.app_context():
     print('Succesfully Cleared Databases and Added Sample Data')
 
     volunteer = User.query.filter_by(email='volunteer@email.com').first()
-    event1 = Event.query.filter_by(name='Event One').first()
-    event2 = Event.query.filter_by(name='Event Two').first()
 
     history1 = VolunteerHistory(
         volunteer_id=volunteer.id,
-        event_id=event1.id,
+        event_id=1,
         participation_date=datetime(2024, 8, 1, 10, 30),
         status="Confirmed"
     )
 
     history2 = VolunteerHistory(
         volunteer_id=volunteer.id,
-        event_id=event2.id,
+        event_id=2,
         participation_date=datetime(2024, 8, 2, 15, 45),
         status="Attended"
     )
