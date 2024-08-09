@@ -8,6 +8,7 @@ import csv
 from io import BytesIO, StringIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from flask_mail import Mail, Message
 
 
 
@@ -15,6 +16,15 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = b'\x8f\xda\xe2o\xfa\x97Qa\xfa\xc1e\xab\xb5z\\f\xf3\x0b\xb9\xa5\xb6\xd7.\xc3'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db.init_app(app)
+
+# for sending verification email
+app.config['MAIL_SERVER']='live.smtp.mailtrap.io'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USERNAME'] = 'api'
+app.config['MAIL_PASSWORD'] = 'ef6d91e830256a6addcf3a0dd0fedd48'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+mail = Mail(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -42,6 +52,7 @@ def about():
 @app.route('/logout')
 def logout():
     logout_user()
+    session.clear()
     flash('You have been logged out.', 'info')
     return redirect(url_for('about'))
 
@@ -117,12 +128,18 @@ def register():
             preferences='',
             availability=''
         )
+        #sending verification email
+        if email == 'volunteerwizards@gmail.com':
+            msg = Message("Welcome to Volunteer Wizards",sender="admin@demomailtrap.com", recipients=[email])
+            msg.body = f"Hello {email},\n\nThank you for registering with us. Please complete your profile."
+            mail.send(msg)
         
         db.session.add(new_user)
         db.session.commit()
 
-        flash("User added, please finish setting up")
-        return redirect(url_for('profile',email=form.email.data))
+        
+        flash("User added, please finish setting up. A confirmation email has been sent.")
+        return redirect(url_for('profile',email=email))
 
     return render_template("register.html", form=form)
 
@@ -130,9 +147,9 @@ def register():
 #Use profile id rather than email for url
 #How to get to this page? name error thrown
 @app.route("/profile/<email>", methods=['GET', 'POST'])
-@login_required
 def profile(email):
     user = User.query.filter_by(email=email).first()
+    role = user.role #just added
     states = State.query.all()
     skills = Skill.query.all()
 
@@ -146,9 +163,13 @@ def profile(email):
         user.availability = ', '.join(request.form.getlist('availability[]'))
         db.session.commit()
         flash("Profile updated successfully.", "success")
-        return redirect(url_for('index'))
+        if role == 'volunteer':
+                flash(f"Welcome back, {user.name}!", "success")
+                return redirect(url_for('volunteer_dashboard', volunteer_id=user.id))
+        elif role == 'admin':
+                return redirect(url_for('admin', email=email)) 
    
-    return render_template("profile.html", user=user, states=states, skills=skills)
+    return render_template("profile.html", email=user.email, user=user, states=states, skills=skills, role=user.role)
 
 #admin required page management 
 def admin_required(f):
