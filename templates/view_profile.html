@@ -1,0 +1,42 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container">
+    <div class="col-lg-8 p-3 mx-auto bg-primary bg-opacity-25 border border-info rounded">
+        <h2 class="text-center">User Profile</h2>
+
+        <div class="mb-3">
+            <label class="form-label"><strong>Full Name:</strong></label>
+            <p>{{ user.name }}</p>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><strong>Address:</strong></label>
+            <p>{{ user.address }}</p>
+        </div>
+
+
+        <div class="mb-3">
+            <label class="form-label"><strong>Skills:</strong></label>
+            <ul>
+                {% for skill in user.skills %}
+                <li>{{ skill.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><strong>Preferences:</strong></label>
+            <p>{{ user.preferences }}</p>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><strong>Availability:</strong></label>
+            <ul>
+                {% for date in user.availability.split(', ') %}
+                <li>{{ date }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

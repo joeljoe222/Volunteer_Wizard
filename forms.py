@@ -1,6 +1,6 @@
 #All forms are found here
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, DateTimeField, StringField, SubmitField, TextAreaField, DateField, SelectField, SelectMultipleField, EmailField, PasswordField, HiddenField
+from wtforms import IntegerField, DateTimeField, StringField, SubmitField, TextAreaField, DateField, SelectField, SelectMultipleField, EmailField, PasswordField, HiddenField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, NumberRange
 
 #Naming SubjectActionForm()
@@ -65,6 +65,7 @@ class EventSelectionForm(FlaskForm):
 #Volunteer Selection Form
 class VolunteerSelectionForm(FlaskForm):
     volunteer_id = HiddenField('Volunteer ID', validators=[DataRequired()])
+    type = BooleanField('Confirm')
     submit = SubmitField('Select Volunteer')
 
 #Volunteer History Form
@@ -74,4 +75,3 @@ class VolunteerHistoryForm(FlaskForm):
     participation_date = DateTimeField('Participation Date', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
     status = StringField('Status', validators=[DataRequired(), Length(max=50)])
     submit = SubmitField('Save')
-

@@ -18,12 +18,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db.init_app(app)
 
 # for sending verification email
-app.config['MAIL_SERVER']='live.smtp.mailtrap.io'
+app.config['MAIL_SERVER']='smtp.sendgrid.net'
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = 'api'
-app.config['MAIL_PASSWORD'] = 'ef6d91e830256a6addcf3a0dd0fedd48'
+app.config['MAIL_USERNAME'] = 'apikey'
+app.config['MAIL_PASSWORD'] = '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'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_DEFAULT_SENDER'] = 'volunteerwizards@gmail.com'
+
 mail = Mail(app)
 
 login_manager = LoginManager()
@@ -123,6 +125,11 @@ def register():
             preferences='',
             availability=''
         )
+        #sending verification email
+       
+        msg = Message("Welcome to Volunteer Wizards", recipients=[email])
+        msg.body = f"Hello {email},\n\nThank you for registering with us. Please complete your profile."
+        mail.send(msg)
         #sending verification email <-------------------------------------------
         if email == 'volunteerwizards@gmail.com':
             msg = Message("Welcome to Volunteer Wizards",sender="admin@demomailtrap.com", recipients=[email])
@@ -137,6 +144,11 @@ def register():
         return redirect(url_for('profile',email=email))
 
     return render_template("register.html", form=form)
+
+@app.route("/view_profile/<email>")
+def view_profile(email):
+    user = User.query.filter_by(email=email).first_or_404()
+    return render_template("view_profile.html", email=user.email, user=user)
 
 
 #Profile page
@@ -421,16 +433,28 @@ def admin_match(event_id):
         existing_history = VolunteerHistory.query.filter_by(
             volunteer_id=volunteer_id, event_id=event_id
         ).first()
-
-        if not existing_history:
-            history = VolunteerHistory(
-                volunteer_id=volunteer_id, event_id=event_id, status='Assigned'
-            )
-            db.session.add(history)
-            db.session.commit()
-            flash(f'Volunteer assigned to event {event.name}!', 'success')
+        if not form.type.data:
+            if not existing_history:
+                history = VolunteerHistory(
+                    volunteer_id=volunteer_id, event_id=event_id, status='Assigned'
+                )
+                db.session.add(history)
+                db.session.commit()
+                flash(f'Volunteer assigned to event {event.name}!', 'success')
+            else:
+                flash(f'Volunteer is already assigned to this event.', 'warning')
         else:
-            flash(f'Volunteer is already assigned to this event.', 'warning')
+            if not existing_history or existing_history.status == "Confirmed":
+                flash(f'Volunteer never attended this event or already confirmed.', 'warning')
+            else:
+                db.session.query(VolunteerHistory).filter(VolunteerHistory.volunteer_id==volunteer_id, VolunteerHistory.event_id==event_id, VolunteerHistory.status=='Assigned').delete()
+                history = VolunteerHistory(
+                    volunteer_id=volunteer_id, event_id=event_id, status='Confirmed'
+                )
+                db.session.add(history)
+                db.session.commit()
+                flash(f'Volunteer Attendence Confirmed for event {event.name}!', 'success')
+                
 
         return redirect(url_for('admin_match', event_id=event_id))
 
