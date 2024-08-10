@@ -21,8 +21,7 @@ skills = {
     'Work with Pets',
     'Security',
     'Greet Guests',
-    'Clean inside',
-    'Clean outside',
+    'Cleaning',
     'Conduct Surveys'
 }
 
@@ -105,6 +104,7 @@ with app.app_context():
             new_state = State(code=state_code, name=state_name)
             db.session.add(new_state)
             state_objs.append(new_state)
+            print(f"Added state: {state_code} - {state_name}")
     db.session.commit()
 
     print('Skill Database and State Database initialized')
@@ -284,6 +284,7 @@ with app.app_context():
     print('Sample Notifications Created')
     print('Succesfully Cleared Databases and Added Sample Data')
 
+    '''
     volunteer = User.query.filter_by(email='volunteer@email.com').first()
 
     history1 = VolunteerHistory(
@@ -295,7 +296,7 @@ with app.app_context():
 
     history2 = VolunteerHistory(
         volunteer_id=volunteer.id,
-        event_id=2,
+        event_id=1,
         participation_date=datetime(2024, 8, 2, 15, 45),
         status="Attended"
     )
@@ -303,5 +304,5 @@ with app.app_context():
     db.session.add(history1)
     db.session.add(history2)
     db.session.commit()
-
+    '''
     print("Sample Volunteer History added.")

@@ -39,9 +39,8 @@ def load_user(user_id):
 #Add register button
 #Exception thrown when submit
 @app.route("/")
-def index():
-    form = LoginForm()   
-    return render_template("index.html", form = form)
+def index():   
+    return render_template("index.html")
 
 #About page
 #Remake to have info on all teammates and who was in charge of what
@@ -54,7 +53,7 @@ def logout():
     logout_user()
     session.clear()
     flash('You have been logged out.', 'info')
-    return redirect(url_for('about'))
+    return redirect(url_for('index'))
 
 #Test Page : Outputs all Databases Data
 #Outputs: SKILL, EVENT, NOTIFICATION, USER
@@ -71,7 +70,6 @@ def test_db_output():
 #User Profile System -----------------------------------------------------------
 
 #Login Page
-#What does this page do? Method Not Allowed error
 @app.route("/login", methods=['GET','POST'])
 def login():
     form = LoginForm()
@@ -92,16 +90,13 @@ def login():
             elif role == 'admin':
                 return redirect(url_for('admin', email=email))
             else:
-                flash("Role not refined, re-register user before trying to sign in", "danger")
+                flash("Role not defined, re-register user before trying to sign in", "danger")
         else:
             flash("Invalid email or password.", "danger")
     return render_template("login.html", form=form)
 
 
-
-
 #Register Page
-#Exception thrown when submit
 @app.route("/register", methods=['GET','POST'])
 def register():
     form = RegisterForm()
@@ -128,7 +123,7 @@ def register():
             preferences='',
             availability=''
         )
-        #sending verification email
+        #sending verification email <-------------------------------------------
         if email == 'volunteerwizards@gmail.com':
             msg = Message("Welcome to Volunteer Wizards",sender="admin@demomailtrap.com", recipients=[email])
             msg.body = f"Hello {email},\n\nThank you for registering with us. Please complete your profile."
@@ -143,9 +138,9 @@ def register():
 
     return render_template("register.html", form=form)
 
+
 #Profile page
-#Use profile id rather than email for url
-#How to get to this page? name error thrown
+#Repopulate data with info <----------------------------------------------------
 @app.route("/profile/<email>", methods=['GET', 'POST'])
 def profile(email):
     user = User.query.filter_by(email=email).first()
@@ -171,6 +166,7 @@ def profile(email):
    
     return render_template("profile.html", email=user.email, user=user, states=states, skills=skills, role=user.role)
 
+
 #admin required page management 
 def admin_required(f):
     @wraps(f)
@@ -184,6 +180,8 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
+#Admin page to manage users
 @app.route('/manage_users', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -198,6 +196,7 @@ def manage_users():
     return render_template('manage_users.html', users=users)
 
 
+#Deletes user
 @app.route('/delete_user/<int:user_id>', methods=['POST'])
 def delete_user(user_id):
     user = User.query.get(user_id)
@@ -207,6 +206,7 @@ def delete_user(user_id):
 
 
 #Notification System -----------------------------------------------------------
+
 
 #Main notification page
 @app.route("/notification")
@@ -225,6 +225,7 @@ def notification_main():
 
     return render_template("notification-main.html", notifications=notifications, events=events, notifications_in_event=notifications_in_event, latest_notification_in_event=latest_notification_in_event)
 
+
 #Create notification page
 @app.route("/notification/create/<int:event_id>", methods=['GET','POST'])
 def notification_create(event_id):
@@ -242,9 +243,11 @@ def notification_create(event_id):
         db.session.commit()
         flash(f'Notification Sent! : {form.name.data}','success')
         
-        return redirect(url_for('notification_create', event_id=event_id))
+        return redirect(url_for('event_view', event_id=event_id))
     return render_template('notification-create.html', form=form, event_id=event_id)
 
+
+#Mange Notification
 @app.route("/notification/manage/<int:event_id>/<int:notification_id>", methods=['GET','POST'])
 def notification_manage(event_id,notification_id):
     event = Event.query.get_or_404(event_id)
@@ -262,6 +265,8 @@ def notification_manage(event_id,notification_id):
         return redirect(url_for('event_view', event_id=event_id))
     return render_template('notification-manage.html', form=form,event_id=event_id, notification_id=notification_id, event=event, notification=notification)
 
+
+#Delete a notification
 @app.route("/notification/delete/<int:event_id>/<int:notification_id>", methods=['POST','GET'])
 def notification_delete(event_id,notification_id):
     notification = Notification.query.filter_by(event_id=event_id, id=notification_id).first()
@@ -283,12 +288,14 @@ def notification_delete(event_id,notification_id):
 
 #Event System ------------------------------------------------------------------
 
+
 #Main event page
 #Complete?
 @app.route("/event")
 def event_main():
     events = Event.query.all()
     return render_template("event-main.html", events=events)
+
 
 #Event page for specified event
 #Complete?
@@ -298,9 +305,9 @@ def event_view(event_id):
     notifications = Notification.query.filter_by(event_id=event_id).all()
     return render_template("event-view.html", event=event, event_id=event_id, notifications=notifications)
 
+
 #Create event page
 #Make it accessible to admins only
-#Once submitted flash to the new event page
 @app.route("/event/create", methods=['GET','POST'])
 def event_create():
     form = EventCreateForm()
@@ -326,7 +333,7 @@ def event_create():
 
         form = EventCreateForm()
         
-        return redirect(url_for('event_create'))
+        return redirect(url_for('event_main'))
     return render_template("event-create.html", form=form)
 
 #Event management page
@@ -361,10 +368,12 @@ def event_manage(event_id):
         db.session.commit()
 
         flash(f'The Event : {form.name.data} has been successfully updated','success')
-        return redirect(url_for('event_manage', event_id=event_id))
+        return redirect(url_for('event_view', event_id=event_id))
 
     return render_template("event-manage.html", form=form, event=event, event_id=event_id)
 
+
+#Delete event
 @app.route("/event/delete/<int:event_id>", methods=['POST','GET'])
 def event_delete(event_id):
     event = Event.query.get_or_404(event_id)
