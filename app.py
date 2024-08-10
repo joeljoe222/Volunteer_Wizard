@@ -18,12 +18,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db.init_app(app)
 
 # for sending verification email
-app.config['MAIL_SERVER']='live.smtp.mailtrap.io'
+app.config['MAIL_SERVER']='smtp.sendgrid.net'
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = 'api'
-app.config['MAIL_PASSWORD'] = 'ef6d91e830256a6addcf3a0dd0fedd48'
+app.config['MAIL_USERNAME'] = 'apikey'
+app.config['MAIL_PASSWORD'] = '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'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_DEFAULT_SENDER'] = 'volunteerwizards@gmail.com'
+
 mail = Mail(app)
 
 login_manager = LoginManager()
@@ -129,10 +131,10 @@ def register():
             availability=''
         )
         #sending verification email
-        if email == 'volunteerwizards@gmail.com':
-            msg = Message("Welcome to Volunteer Wizards",sender="admin@demomailtrap.com", recipients=[email])
-            msg.body = f"Hello {email},\n\nThank you for registering with us. Please complete your profile."
-            mail.send(msg)
+       
+        msg = Message("Welcome to Volunteer Wizards", recipients=[email])
+        msg.body = f"Hello {email},\n\nThank you for registering with us. Please complete your profile."
+        mail.send(msg)
         
         db.session.add(new_user)
         db.session.commit()
@@ -142,6 +144,12 @@ def register():
         return redirect(url_for('profile',email=email))
 
     return render_template("register.html", form=form)
+
+@app.route("/view_profile/<email>")
+def view_profile(email):
+    user = User.query.filter_by(email=email).first_or_404()
+    return render_template("view_profile.html", email=user.email, user=user)
+
 
 #Profile page
 #Use profile id rather than email for url
