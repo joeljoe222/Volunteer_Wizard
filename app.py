@@ -412,16 +412,28 @@ def admin_match(event_id):
         existing_history = VolunteerHistory.query.filter_by(
             volunteer_id=volunteer_id, event_id=event_id
         ).first()
-
-        if not existing_history:
-            history = VolunteerHistory(
-                volunteer_id=volunteer_id, event_id=event_id, status='Assigned'
-            )
-            db.session.add(history)
-            db.session.commit()
-            flash(f'Volunteer assigned to event {event.name}!', 'success')
+        if not form.type.data:
+            if not existing_history:
+                history = VolunteerHistory(
+                    volunteer_id=volunteer_id, event_id=event_id, status='Assigned'
+                )
+                db.session.add(history)
+                db.session.commit()
+                flash(f'Volunteer assigned to event {event.name}!', 'success')
+            else:
+                flash(f'Volunteer is already assigned to this event.', 'warning')
         else:
-            flash(f'Volunteer is already assigned to this event.', 'warning')
+            if not existing_history or existing_history.status == "Confirmed":
+                flash(f'Volunteer never attended this event or already confirmed.', 'warning')
+            else:
+                db.session.query(VolunteerHistory).filter(VolunteerHistory.volunteer_id==volunteer_id, VolunteerHistory.event_id==event_id, VolunteerHistory.status=='Assigned').delete()
+                history = VolunteerHistory(
+                    volunteer_id=volunteer_id, event_id=event_id, status='Confirmed'
+                )
+                db.session.add(history)
+                db.session.commit()
+                flash(f'Volunteer Attendence Confirmed for event {event.name}!', 'success')
+                
 
         return redirect(url_for('admin_match', event_id=event_id))
 
