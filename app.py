@@ -21,7 +21,7 @@ db.init_app(app)
 app.config['MAIL_SERVER']='smtp.sendgrid.net'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USERNAME'] = 'apikey'
-app.config['MAIL_PASSWORD'] = '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'
+app.config['MAIL_PASSWORD'] = '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'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_DEFAULT_SENDER'] = 'volunteerwizards@gmail.com'
@@ -127,14 +127,14 @@ def register():
         )
         #sending verification email
        
-        msg = Message("Welcome to Volunteer Wizards", recipients=[email])
-        msg.body = f"Hello {email},\n\nThank you for registering with us. Please complete your profile."
-        mail.send(msg)
-        #sending verification email <-------------------------------------------
-        if email == 'volunteerwizards@gmail.com':
-            msg = Message("Welcome to Volunteer Wizards",sender="admin@demomailtrap.com", recipients=[email])
-            msg.body = f"Hello {email},\n\nThank you for registering with us. Please complete your profile."
-            mail.send(msg)
+        try:
+         msg = Message("Welcome to Volunteer Wizards", recipients=[email])
+         msg.body = f"Hello {email},\n\nThank you for registering with us. Please complete your profile."
+         mail.send(msg)
+         
+        except Exception as e:
+            app.logger.error(f"Failed to send email to {email}: {e}")
+        
         
         db.session.add(new_user)
         db.session.commit()
