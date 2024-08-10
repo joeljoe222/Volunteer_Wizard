@@ -64,26 +64,5 @@
             {% endfor %}
         </ul>
     </div>
-    <h1>Volunteer Histories</h1>
-<table>
-    <thead>
-        <tr>
-            <th>Volunteer Name</th>
-            <th>Event Name</th>
-            <th>Status</th>
-            <th>Participation Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for history in volunteer_histories %}
-        <tr>
-            <td>{{ history.volunteer.name }}</td>
-            <td>{{ history.event.name }}</td>
-            <td>{{ history.status }}</td>
-            <td>{{ history.participation_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
 </body>
 </html>
